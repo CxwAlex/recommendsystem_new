@@ -16,8 +16,6 @@ def ETL(raw_data, raw_schema, result_schema):
     return None
 
 def RecommendationCore(train,user,):
-    recommendation = {}
-    recommendation.add()
     #基于用户行为的推荐系统CF推荐系统引擎使用
     #recommend1 = RecommendUserCF(train, user=None, k=1, N=1, similarity=None, sort=True)
     #recommend2 = RecommendItemCF(train, user=None, k=1, N=1, similarity=None, sort=True)
@@ -38,13 +36,14 @@ def RecommendationCore(train,user,):
 
     #一些常用的推荐系统
     #最热门推荐
-    #
-    #最近最热门推荐
-    #
+    #recommend7 = RecommendMostHot(dataframe, N=1, type='day', date_now=None)
+    #分为当日最热门（day），一周(week)，一年(year)和所有记录（ever）
+
     #冷启动物品的推荐
-    #
+    #仅针对新物品或者冷门物品推荐
+    #recommend8 = RecommendColdStartItem(cold_items, N=1)
     #出于广告目的的推荐
-    #
+    #recommend9 = RecommendADs(ad_items, N=1)
 
     return recommendation
 

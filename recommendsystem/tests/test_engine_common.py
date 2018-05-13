@@ -1,7 +1,6 @@
 import unittest
-import datetime
 from recommendsystem.engine_common import *
-from recommendsystem.ETL import raw2std
+from recommendsystem.utils import raw2std, list2dataframe_time
 
 train1 = {
     #         0  1  2  3  4  5  6  7  8  9
@@ -14,14 +13,15 @@ train1 = {
 
 
 raw_data1 = [
-    ["user1", "item1", 0],
-    ["user1", "item5", 1],
-    ["user2", "item2", 0],
-    ["user2", "item3", 2],
-    ["user2", "item5", 5],
-    ["user3", "item1", 2],
-    ["user3", "item3", 3],
-    ["user3", "item4", 4]
+    ["user1", "item1", '2018-05-09'],
+    ["user1", "item5", '2018-05-11'],
+    ["user1", "item2", '2018-05-01'],
+    ["user2", "item2", '2018-05-07'],
+    ["user2", "item3", '2018-04-01'],
+    ["user2", "item5", '2018-04-1'],
+    ["user3", "item1", '2018-05-07'],
+    ["user3", "item4", '2018-03-21'],
+    ["user3", "item2", '2018-05-01']
 ]
 
 
@@ -46,41 +46,24 @@ class MostHotTest(unittest.TestCase):
 
     def test_most_hot(self):
         train = raw2std(train1)
-        result = RecommendMostHot(train)
+        result = RecommendMostHotEver(train)
         self.assertEqual(result[0], 1)
 
     def test_most_hot_today(self):
-        a = '2018-5-12'
-        b = datetime.date(a)
-        print(b)
-        '''
-        转成datetime处理，处理好了再转成字符串
-import datetime
- 
-b = datetime.datetime.strptime("2016-3-1", "%Y-%m-%d")
-c = b + datetime.timedelta(days=-2)
-print(c.strftime("%Y-%m-%d"))
-
->>> a='2015-6-9'
-
->>> datetimeObj = time.strptime(a, "%Y-%m-%d")
-
->>> datetimeObj
-(2015, 6, 9, 0, 0, 0, 1, 160, -1)
->>> time.strftime("%Y%m%d",datetimeObj)
-'20150609'
-
-        '''
-        return None
+        train = list2dataframe_time(raw_data1)
+        result = RecommendMostHotDay(train, date_now='2018-05-11')
+        self.assertEqual(result[0], 'item5')
 
     def test_most_hot_week(self):
-        return None
+        train = list2dataframe_time(raw_data1)
+        result = RecommendMostHotWeek(train, date_now='2018-05-11')
+        self.assertEqual(result[0], 'item1')
+
 
     def test_most_hot_month(self):
-        return None
-
-    def test_most_hot_year(self):
-        return None
+        train = list2dataframe_time(raw_data1)
+        result = RecommendMostHotMonth(train, date_now='2018-05-11')
+        self.assertEqual(result[0], 'item2')
 
 if __name__ == '__main__':
     unittest.main()

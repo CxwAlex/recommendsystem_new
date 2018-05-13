@@ -1,6 +1,6 @@
 import unittest
 from recommendsystem.engine_cf import *
-from recommendsystem.ETL import *
+from recommendsystem.utils import raw2std
 #构造原始数据集
 raw_data1 = {
     "user1": ["item1", "item2", "item3"],
@@ -114,7 +114,7 @@ class UserCFTest(unittest.TestCase):
         rank = RecommendItemCF(train)
         #self.assertAlmostEqual(rank["user1"]["item5"], 3.15470053)
 
-'''
+
     def test_PersonalRank(self):
         train = {
             #         1  2  3  4  5  6  7  8  9  10
@@ -130,6 +130,6 @@ class UserCFTest(unittest.TestCase):
         self.assertAlmostEqual(rank["user1"]["item1"], 0)
         #注意，随机游走算法的结果会变化，但是随着训练次数的增多，理论上应该不会错
         self.assertGreater(rank["user1"]["item5"], 0.4)
-'''
+
 if __name__ == '__main__':
     unittest.main()

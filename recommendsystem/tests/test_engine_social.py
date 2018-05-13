@@ -1,7 +1,7 @@
 # encoding=utf-8
 import unittest
 from recommendsystem.engine_social import *
-from recommendsystem.ETL import matrix2dataframe, raw2std, graph2dataframe
+from recommendsystem.utils import matrix2dataframe, raw2std, graph2dataframe
 
 #构造原始数据集
 raw_data_no = {

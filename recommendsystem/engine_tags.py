@@ -2,7 +2,7 @@ import math
 from pandas import Series, DataFrame
 from collections import defaultdict
 from recommendsystem.utils import count_set, count_tags
-from recommendsystem.utils import get_user_item,get_item_tags,get_user_tags,get_user_item_tag
+from recommendsystem.utils import get_user_item, get_item_tags,get_user_tags,get_user_item_tag
 
 #修改成一个通用的计算相似度的方式
 def SimilarityTags(dataframe, feature=None):

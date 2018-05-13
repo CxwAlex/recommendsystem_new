@@ -23,7 +23,6 @@ class UtilsTest(unittest.TestCase):
 
     def test_get_user_item_tag(self):
         result = get_user_item_tag(user_item_tag)
-        print(result)
         #self.assertEqual(result[1][1],'微波炉菜谱')
 
     def test_get_user_tags(self):
@@ -43,7 +42,16 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(train["python"], 4)
 
     def test_split_data(self):
-        train,test = SplitData(user_item_tag)
+        #train,test = SplitData(user_item_tag)
         #print("test_split_data")
         #print(train)
         #print(test)
+        return None
+
+    def test_datediff(self):
+        date1 = '2018-11-11'
+        date2 = '2008-08-08'
+        diff = datediff(date1, date2)
+        self.assertEqual(diff, 3747)
+        diff2 = datediff(date1, date2, return_type='year')
+        self.assertEqual(diff2, 10.27)
