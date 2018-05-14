@@ -1,16 +1,10 @@
-import numpy
-from pandas import Series, DataFrame
-from collections import defaultdict
-import random
-import math
-
-#实际上的多引擎并不单单只是指算法上的多引擎，更多的是指在业务上的：
-#比如专门负责冷启动的，专门负责重点广告业务的等，即常见的浏览器中其他文章+广告的模式
-
-#推荐系统核心模块，处理的是特征维度，而不仅仅是简单的行为、矩阵、图
-#对单一用户的推荐+推荐理由
-
-#todo:分成两部分，第一部分对单个用户进行推荐，第二部分对整个矩阵进行推荐
+from recommendsystem.ETL import MovieLensRatings2Dataframe
+from recommendsystem.utils import SplitData
+from recommendsystem.engine_cf import *
+from recommendsystem.engine_common import *
+from recommendsystem.engine_time import *
+from recommendsystem.engine_tags import *
+from recommendsystem.engine_social import *
 
 def ETL(raw_data, raw_schema, result_schema):
     return None
@@ -60,9 +54,10 @@ def Filter(train, recommendation, user=None):
 def Sort(recommendation, weight, user=None):
     for recommend in recommendation:
         for i in recommend:
-            result[i] = wi * wengine
-    result.sort
-    return result
+            continue
+            #result[i] = wi * wengine
+    #result.sort
+    return None
 
 def Reason(recommendation,recommendation_after_sort):
     for i in recommendation_after_sort:
@@ -71,6 +66,9 @@ def Reason(recommendation,recommendation_after_sort):
 
 
 if __name__ == '__main__':
+    #此处先对MovieLens的1M数据集进行测试，现阶段只考虑用户是否会对某部电影评分，而不考虑分数值
+    #使用的推荐引擎：随机、基于用户相似度、基于物品相似度、基于人口统计学的用户相似度，基于时间上下文的推荐
+
     train = ETL()
     recommendation = RecommendationCore()
     recommendation_after_filter = Filter(recommendation)

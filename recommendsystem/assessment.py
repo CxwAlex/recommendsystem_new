@@ -1,3 +1,6 @@
+def Summary():
+    return None
+
 #计算准确率和召回率
 def Recall(train, test, N):
     hit = 0
@@ -131,3 +134,14 @@ def GiniIndex(p):
         G += (2 * j - n - 1) * weight
     return G / float(n - 1)
     '''
+
+'''
+if rv is not None and rsv is not None:
+# extract version/subversion
+self._nmap_version_number = int(line[rv.start():rv.end()])
+self._nmap_subversion_number = int(line[rsv.start()+1:rsv.end()])
+break
+}
+
+
+'''

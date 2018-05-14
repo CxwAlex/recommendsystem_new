@@ -72,15 +72,19 @@ def count_tags(train):
 
 
 #获取三元组数据的行和列
-def get_columns_and_index(train):
+def get_columns_and_index(train, user_place=0, item_place=1):
 
     # todo:如何解决顺序问题
     u = set()
     i = set()
     for a in train:
-        u.add(a[0])
-        i.add(a[1])
-    return u, i
+        u.add(a[user_place])
+        i.add(a[item_place])
+
+    user_std = sorted(list(u), key=int)
+    item_std = sorted(list(i), key=int)
+
+    return user_std, item_std
 
 
 #根据user、item、tag为主键切分数据集
@@ -217,7 +221,7 @@ def list2dataframe_time(train, columns= None, index= None):
 
 #todo:该函数以来具体的数据格式
 #将数据集拆分成训练集和测试集的过程
-def SplitData(data, M=100, k=10, seed=0):
+def SplitData(data, M=10, k=1, seed=0):
     test = []
     train = []
     random.seed(seed)
