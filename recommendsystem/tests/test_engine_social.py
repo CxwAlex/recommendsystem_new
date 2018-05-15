@@ -160,15 +160,16 @@ class SocialRecommendTest(unittest.TestCase):
         train_uu = matrix2dataframe(train_mat_yes)
         train_ui = raw2std(train_user_item)
         result = RecommendSocial(train_uu, train_ui, N=4)
-        self.assertEqual(result["user1"][0], 0)
-        self.assertEqual(result["user9"][3], 8)
+        print(result)
+        self.assertEqual(result["user1"][0], 7)
+        self.assertEqual(result["user9"][3], 7)
 
     def test_FriendSuggestion_no_direction(self):
         train_uu = graph2dataframe(raw_data_no)
         train_ui = raw2std(train_user_item)
         result = RecommendSocial(train_uu, train_ui, N=4)
-        self.assertEqual(result["user1"][0], 0)
-        self.assertEqual(result["user9"][3], 3)
+        self.assertEqual(result["user1"][0], 7)
+        self.assertEqual(result["user9"][3], 7)
 
 
 if __name__ == '__main__':

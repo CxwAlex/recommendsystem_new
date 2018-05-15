@@ -1,4 +1,5 @@
 import os
+from conf.settings import Parameter
 from recommendsystem.ETL import MovieLensRatings2Dataframe, WriteLog
 from recommendsystem.utils import SplitData
 from recommendsystem.assessment import Summary
@@ -35,60 +36,58 @@ def RecommendAndParameter(recommend_engine, train, user=None, parameters=None):
         if parameters:
             for k in parameters['k']:
                 for N in parameters['N']:
-                    recommend = RecommendUserCF(train, user=user, k=k, N=N)
-
-
+                    for similarity in parameters['similarity']:
+                        recommend = RecommendUserCF(train, user=user, k=k, N=N, similarity=similarity)
+        else:
+            recommend = RecommendUserCF(train, user)
     elif recommend_engine == 'RecommendItemCF':
         if parameters:
             for k in parameters['k']:
                 for N in parameters['N']:
-                    recommend = RecommendUserCF(train, user=user, k=k, N=N)
-    elif recommend_engine == 'RecommendSocial':
-        if parameters:
-            for k in parameters['k']:
-                for N in parameters['N']:
-                    recommend = RecommendUserCF(train, user=user, k=k, N=N)
-
-    elif recommend_engine == 'RecommendByTags':
-        if parameters:
-            for k in parameters['k']:
-                for N in parameters['N']:
-                    recommend = RecommendUserCF(train, user=user, k=k, N=N)
-
-
-    elif recommend_engine == 'RecommendItemSimilarityTime':
-        if parameters:
-            for k in parameters['k']:
-                for N in parameters['N']:
-                    recommend = RecommendUserCF(train, user=user, k=k, N=N)
-
-
-    elif recommend_engine == 'RecommendUserSimilarityTime':
-        if parameters:
-            for k in parameters['k']:
-                for N in parameters['N']:
-                    recommend = RecommendUserCF(train, user=user, k=k, N=N)
-
-
-    elif recommend_engine == 'RecommendMostHot':
-        if parameters:
-            for k in parameters['k']:
-                for N in parameters['N']:
-                    recommend = RecommendUserCF(train, user=user, k=k, N=N)
-
-
-    elif recommend_engine == 'RecommendColdStartItem':
-        if parameters:
-            for k in parameters['k']:
-                for N in parameters['N']:
-                    recommend = RecommendUserCF(train, user=user, k=k, N=N)
-
-
+                    for similarity in parameters['similarity']:
+                        recommend = RecommendItemCF(train, user=user, k=k, N=N, similarity=similarity)
+        else:
+            recommend = RecommendItemCF(train, user)
+    #social暂不使用，因为没有社交属性数据
+    #elif recommend_engine == 'RecommendSocial':
+    #   if parameters:
+    #        for k in parameters['k']:
+    #            for N in parameters['N']:
+    #                recommend = RecommendSocial(dataframe_social, dataframe_item, user=None, k=k, N=N)
+    #tags暂时不用
+    #elif recommend_engine == 'RecommendByTags':
+    #    if parameters:
+    #        for N in parameters['N']:
+    #            recommend = RecommendByTags(user_item_tags, user=None, N=N)
+    #elif recommend_engine == 'RecommendItemSimilarityTime':
+    #    if parameters:
+    #        for k in parameters['k']:
+    #            for N in parameters['N']:
+    #                recommend = RecommendUserCF(train, user=user, k=k, N=N)
+    #elif recommend_engine == 'RecommendUserSimilarityTime':
+    #    if parameters:
+    #        for k in parameters['k']:
+    #            for N in parameters['N']:
+    #                recommend = RecommendUserCF(train, user=user, k=k, N=N)
+    #elif recommend_engine == 'RecommendMostHot':
+    #    if parameters:
+    #        for k in parameters['k']:
+    #            for N in parameters['N']:
+    #                recommend = RecommendUserCF(train, user=user, k=k, N=N)
+    #elif recommend_engine == 'RecommendColdStartItem':
+    #    if parameters:
+    #        for k in parameters['k']:
+    #            for N in parameters['N']:
+    #                recommend = RecommendUserCF(train, user=user, k=k, N=N)
     elif recommend_engine == 'RecommendRandom':
         if parameters:
-            for k in parameters['k']:
-                for N in parameters['N']:
-                    recommend = RecommendUserCF(train, user=user, k=k, N=N)
+            for N in parameters['N']:
+                if user:
+                    recommend = RecommendRandom(train.index, N=N)
+                else:
+                    recommend = DataFrame(columns=train.columns)
+                    for u in train.columns:
+                        recommend[u] = RecommendRandom(train.index, N=N)
 
     return recommend
 
@@ -99,19 +98,3 @@ def Result2Log(result, recommend_engine):
     num = WriteLog(result, filepath)
 
     return num
-
-
-def TrainAndTest():
-    return None
-
-
-def TestParameter(parameter):
-    return None
-
-
-
-#分割数据集
-
-#对不同的数据集，采用不同的模型进行训练
-
-#所有模型训练后一起评估

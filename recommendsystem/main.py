@@ -15,7 +15,7 @@ def RecommendationCore(train,user,):
     #recommend2 = RecommendItemCF(train, user=None, k=1, N=1, similarity=None, sort=True)
 
     #基于社交网络的推荐系统的使用
-    #recommend3 = RecommendSocial(dataframe_social, dataframe_item, user=None, N=1)
+    #recommend3 = RecommendSocial(dataframe_social, dataframe_item, user=None, k=1, N=1)
     #推荐朋友
     #frend = FriendSuggestion(dataframe, user=None, N=1, filter=True)
 

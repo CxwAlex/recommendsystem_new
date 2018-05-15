@@ -107,11 +107,11 @@ def FriendSuggestion(dataframe, user=None, N=1, filter=True):
     return suggestion
 
 
-def RecommendSocial(dataframe_social, dataframe_item, user=None, N=1):
+def RecommendSocial(dataframe_social, dataframe_item, user=None, k=1, N=1):
     similarity_uu = social_similarity(dataframe_social, user)
     if user:
         rank = Series(0.0, index=dataframe_item.index)
-        for v in dataframe_social.columns:
+        for v in similarity_uu[user].sort_values(ascending=False).index[0:k]:
             if user == v or similarity_uu[user][v] == 0:
                 continue
             for i in dataframe_item.index:
@@ -121,7 +121,7 @@ def RecommendSocial(dataframe_social, dataframe_item, user=None, N=1):
     else:
         rank = DataFrame(0.0, index=dataframe_item.index, columns=dataframe_social.columns)
         for u in dataframe_social.columns:
-            for v in dataframe_social.columns:
+            for v in similarity_uu[u].sort_values(ascending=False).index[0:k]:
                 if u == v or similarity_uu[u][v] == 0:
                     continue
                 for i in dataframe_item.index:
