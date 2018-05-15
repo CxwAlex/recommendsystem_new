@@ -1,85 +1,141 @@
-def Summary():
-    return None
+import math
+from pandas import Series, DataFrame
+from recommendsystem.engine_cf import ItemSimilarityCF
+
+#对推荐结果进行总结
+#其中，train是原始的训练集dataframe， recommend是推荐结果dataframe
+#test是测试集的dataframe或者多元组
+def Summary(train, recommend, test, item_similarity=None):
+    recall = Recall(recommend, test)
+    precision = Precision(recommend, test)
+    coverage = Coverage(train, recommend)
+    popularity = Popularity(train, recommend)
+    novelty = Novelty(train, recommend)
+    if not item_similarity:
+        item_similarity = ItemSimilarityCF(train)
+    diversity = Diversity(recommend, item_similarity)
+    '''
+    index_all = ['recall', 'precision', 'coverage', 'popularity', 'novelty', 'diversity']
+    result = Series(index=index_all)
+    result['recall'] = recall
+    result['precision'] = precision
+    result['coverage'] = coverage
+    result['popularity'] = popularity
+    result['novelty'] = novelty
+    result['diversity'] = diversity
+    '''
+    result = {'recall':recall, 'precision':precision, 'coverage':coverage, 'popularity':popularity, 'novelty':novelty, 'diversity':diversity}
+    return result
 
 #计算准确率和召回率
-def Recall(train, test, N):
-    hit = 0
+def Recall(recommend, test):
     all = 0
-    for user in train.keys():
-        tu = test[user]
-        rank = GetRecommendation(user, N)
-        for item in rank:
-            if item in tu:
-                hit += 1
-        all += len(tu)
-    return hit / (all * 1.0)
+    #分为原始数据和dataframe两种方式
+    if isinstance(test, DataFrame):
+        for u in test.columns:
+            for i in test.index:
+                if test[u][i] != 0:
+                    all += 1
+    else:
+        all = len(test)
 
-def Precision(train, test, N):
-    hit = 0
+    hit = Hit(recommend, test)
+
+    return hit / all
+
+
+def Precision(recommend, test):
     all = 0
-    for user in train.keys():
-        tu = test[user]
-        rank = GetRecommendation(user, N)
-        for item in rank:
-            if item in tu:
-                hit += 1
+    N = len(recommend.index)
+
+    for user in recommend.columns:
         all += N
-    return hit / (all * 1.0)
+
+    hit =Hit(recommend, test)
+
+    return hit / all
+
+def Hit(recommend, test):
+    hit = 0
+    #分为原始数据和dataframe两种方式
+    if isinstance(test, DataFrame):
+        for user in test.columns:
+            for item in test.index:
+                if test[user][item] != 0:
+                    if user in recommend.columns and item in recommend[user].values:
+                        hit += 1
+    else:
+        for i in test:
+            if i[0] in recommend.columns and i[1] in recommend[i[0]].values:
+                hit += 1
+    return hit
+
 
 #计算覆盖率
-def Coverage(train, N):
+def Coverage(train, recommend):
     recommend_items = set()
     all_items = set()
-    for user in train.keys():
-        for item in train[user]:
+
+    for item in train.index:
             all_items.add(item)
-        rank = GetRecommendation(user, N)
-        for item in rank:
+
+    for user in recommend.columns:
+        for item in recommend[user].values:
             recommend_items.add(item)
-    return len(recommend_items) / (len(all_items) * 1.0)
+
+    return len(recommend_items) / len(all_items)
+
 
 #计算新颖度
-def Popularity(train, N):
-    #首先计算不同物品的流行度
-    item_popularity = dict()
-    for user, items in train.items():
-        for item in items:
-            if item not in item_popularity:
-                item_popularity[item] = 1
-            item_popularity[item] += 1
-    #接着计算推荐物品的流行度
-    ret = 0
+#如果推荐的每个物品都很流行，那么结果或很高，新颖度会很低；反之如果每个物品都是冷门物品，则结果约等于1
+def Popularity(train, recommend):
+    popularity = 0
     n = 0
-    for user in train.keys():
-        rank = GetRecommendation(user, N)
-        for item in rank:
-            #print(item_popularity[item])
-            #print(math.log(item_popularity[item]))
-            ret += math.log(1 + item_popularity[item])
-            n += 1
-    ret /= n * 1.0
-    return ret
 
+    #首先计算不同物品的流行度
+    item_popularity = Series(0.0, index=recommend.index)
+    for user in train.columns:
+        for item in train.index:
+            if train[user][item] != 0:
+                if item not in item_popularity:
+                    item_popularity[item] = 1
+                item_popularity[item] += 1
+
+    #接着计算推荐物品的流行度
+    for user in recommend.columns:
+        for item in recommend[user].values:
+            if item in item_popularity.index:
+                popularity += math.log(1 + item_popularity[item])
+                n += 1
+
+    popularity /= n
+
+    return popularity
+
+def Novelty(train, recommend):
+    novelty = 1 / Popularity(train, recommend)
+    return novelty
 
 #利用相似度度量计算推荐列表的多样性
-# 如果推荐的物品相似度都很高，则说明多样性不强，反之，若相似度都不高，则说明多样性很高
-# todo：这个评测在什么时候做，针对单个用户或者用户全体做等
-# todo：暂时不能评测，因为推荐部分还没有完成——基于标签相似度的推荐
-def Diversity(item_tags, recommend_items):
-    ret = 0
+#如果推荐的物品相似度都很高，则说明多样性不强，反之，若相似度都不高，则说明多样性很高
+def Diversity(recommend, item_similarity):
+    similarity = 0
     n = 0
-    for i in recommend_items.keys():
-        for j in recommend_items.keys():
+    recommend_items = set()
+    for user in recommend.columns:
+        for item in recommend[user].values:
+            recommend_items.add(item)
+
+    for i in recommend_items:
+        for j in recommend_items:
             if i == j:
                 continue
-            ret += item_similarity(item_tags, i, j)
-            n += 1
-    #return 1 - ret / (n * 1.0)
-    return None
+            if i in item_similarity.columns and j in item_similarity.index:
+                similarity += item_similarity[i][j]
+                n += 1
 
+    return 1 - math.sqrt(similarity/n)
 
-import math
-import operator
 
 
 # 计算RMSE和MAE

@@ -2,7 +2,7 @@ import unittest
 import os
 from recommendsystem.ETL import *
 
-'''
+
 class ReadFileTest(unittest.TestCase):
 
     def test_read_file(self):
@@ -35,7 +35,7 @@ class ReadFileTest(unittest.TestCase):
         read = ReadFile(read_filepath, lines=10)
         write_filepath = pwd + '/test_etl/testwrite.pkl'
         PickleWriteFile(read, write_filepath)
-'''
+
 class MovieLensTest(unittest.TestCase):
 
     def test_rating2dataframe(self):

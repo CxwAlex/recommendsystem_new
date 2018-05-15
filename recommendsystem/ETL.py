@@ -1,5 +1,5 @@
 import pickle
-import numpy
+import os
 import random
 from pandas import Series, DataFrame
 from recommendsystem.utils import get_columns_and_index
@@ -38,6 +38,14 @@ def PickleWriteFile(data, filepath):
     # 随后调用load()来以同样的顺序反序列化读出这些对象。
     return None
 
+def WriteLog(data, filepath, mode='a'):
+    if not filepath:
+        pwd = os.getcwd()
+        project_filepath = os.path.abspath(os.path.dirname(pwd) + os.path.sep + "..")
+        filepath = project_filepath + '/Log/default.log'
+
+    num = WriteFile(data, filepath, mode)
+    return num
 
 #############################
 #以下是MovieLens数据的ETL

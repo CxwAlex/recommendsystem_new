@@ -158,14 +158,14 @@ def raw2std(raw_data,index=None):
     mid_data = DataFrame(raw_data)
     if isinstance(mid_data[mid_data.columns[0]][mid_data.index[0]], (numpy.int64, numpy.float64)):
         if index:
-            result = DataFrame(raw_data, index= index)
+            result = DataFrame(raw_data, index=index)
         else:
             result = DataFrame(raw_data)
     elif isinstance(mid_data[mid_data.columns[0]][mid_data.index[0]], str):
         result = list2matrix(raw_data)
     else:
         raise TypeError("not support data formart")
-    #todo：三元组格式给出的结果
+
     return result
 
 
