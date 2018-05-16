@@ -233,7 +233,6 @@ def FilterAndSort(train, rank, user=None, N=1):
         for u in train.columns:
             for i in train.index[train[u] != 0]:
                 rank[u][i] = 0
-
         result = SortRank(rank, N)
 
     return result
@@ -244,7 +243,7 @@ def FilterAndSort(train, rank, user=None, N=1):
 def RecommendUserCF(train, user=None, k=1, N=1, similarity=None):
     user_similarity = GetUserSimilarity(train, similarity)
     rank = GetRankUserCF(train, user, k, user_similarity)
-    recommend = FilterAndSort(train, rank, user=user, N=N)
+    recommend = FilterAndSort(train, rank, user=None, N=1)
 
     return recommend
 
@@ -252,77 +251,6 @@ def RecommendUserCF(train, user=None, k=1, N=1, similarity=None):
 def RecommendItemCF(train, user=None, k=1, N=1, similarity=None, sort=True):
     item_similarity = GetItemSimilarity(train, similarity)
     rank = GetRankItemCF(train, user, k, item_similarity)
-    recommend = FilterAndSort(train, rank, user=user, N=N)
+    recommend = FilterAndSort(train, rank, user=None, N=1)
 
     return recommend
-
-
-#基于图的随机游走算法
-#train是训练集，p是每次漫步的继续的随机数，即有p的概率继续向下走
-#N是每个用户重复训练的次数, is_P决定返回是概率还是频率，默认概率
-def PersonalRank(train, user=None, p=0.8, repeat_times=10, N=1, is_P=True, filter_item=True):
-    users_items = Series(index=train.columns)
-    items_users = Series(index=train.index)
-    for u in train.columns:
-        users_items[u] = train.index[train[u] != 0]
-    for i in train.index:
-        items_users[i] = train.columns[train.ix[i] != 0]
-
-    #接下来开始随机游走——分为两步：随机走一步&随机停
-    result = DataFrame(0.0, index= train.index, columns= train.columns)
-
-    for u in train.columns:
-        for count in range(0, repeat_times):
-            i = random.sample(list(users_items[u]), 1)[0]
-            if filter_item:
-                while i in users_items[u]:
-                    while random.random() <= p:
-                        iu = random.sample(list(items_users[i]), 1)[0]
-                        i = random.sample(list(users_items[iu]), 1)[0]
-            else:
-                while random.random() <= p:
-                    iu = random.sample(list(items_users[i]), 1)[0]
-                    i = random.sample(list(users_items[iu]), 1)[0]
-            if is_P:
-                result[u][i] += 1 / repeat_times
-            else:
-                result[u][i] += 1
-        print(u, ',rank,done')
-
-    return result
-
-def RecommendPersonRank(train, user=None, p=0.8, repeat_times=10, N=1, is_P=True, filter_item=True):
-    rank = PersonalRank(train, user, p, repeat_times, N, is_P, filter_item)
-    recommend = FilterAndSort(train, rank, user, N)
-
-    return recommend
-
-'''
-#利用倒排方法计算用户相似度
-def UserSimilarityBackCF(train):
-    train_item_user = train.T
-    #calculate co-rated items between users
-    #C表示u和v对拥有相同兴趣的物品数
-    #N表示用户对物品产生行为的个数
-    N = train_item_user.apply(func=count_set, axis=1)
-    C = DataFrame(0, index=train.columns, columns=train.columns)
-    for item in train_item_user.columns:
-        for u in train_item_user.index:
-            for v in train_item_user.index:
-                if train_item_user[item][u] == 0 or train_item_user[item][v] == 0 or u == v:
-                    continue
-                else:
-                    C[u][v] += 1
-
-    #calculate finial similarity matrix W
-    W = DataFrame(0.0, index=train_item_user.index, columns=train_item_user.index)
-    for u in train_item_user.index:
-        for v in train_item_user.index:
-            if u == v:
-                W[u][v] += 1
-            elif N[u] * N[v]:
-                W[u][v] += C[u][v] / math.sqrt(N[u] * N[v])
-    return W
-
-
-'''
