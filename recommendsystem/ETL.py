@@ -21,6 +21,8 @@ def WriteFile(data, filepath, mode='w'):
             str_data = str(data)
             num = f.write(str_data)
 
+        f.write('\n')
+
     return num
 
 
@@ -38,45 +40,73 @@ def PickleWriteFile(data, filepath):
     # 随后调用load()来以同样的顺序反序列化读出这些对象。
     return None
 
-def WriteLog(data, filepath, mode='a'):
+def WriteLog(data=None, filepath=None, mode='a'):
     if not filepath:
-        pwd = os.getcwd()
-        project_filepath = os.path.abspath(os.path.dirname(pwd) + os.path.sep + "..")
-        filepath = project_filepath + '/Log/default.log'
+        pwd = os.path.split(os.path.realpath(__file__))[0]
+        project_filepath = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")
+        filepath = project_filepath + '/Log'
+        if not os.path.exists(filepath):
+            os.makedirs(filepath)
+        filepath += '/default.log'
 
     num = WriteFile(data, filepath, mode)
     return num
+
 
 #############################
 #以下是MovieLens数据的ETL
 #############################
 
 #适用于cf的数据集
-def MovieLensRatings2Dataframe(filepath, lines, users=None, items=None):
+def MovieLensRatings2Dataframe(filepath, lines=None, users=None, items=None):
     data_raw = ReadFile(filepath, lines=lines)
-    data_mid = []
+    data_std = []
     for i in data_raw:
         j = i.split('::')
-        data_mid.append(j)
+        data_std.append(j)
 
     if not users and not items:
-        user_std, item_std = get_columns_and_index(data_mid)
+        user_std, item_std = get_columns_and_index(data_std)
     elif not users:
-        user_std = get_columns_and_index(data_mid)[0]
+        user_std = get_columns_and_index(data_std)[0]
     elif not items:
-        item_std = get_columns_and_index(data_mid)[1]
+        item_std = get_columns_and_index(data_std)[1]
     else:
         user_std = users
         item_std = items
 
-    data_std = DataFrame(0, columns=user_std, index=item_std)
-    for i in data_mid:
-        data_std[i[0]][i[1]] += int(i[2])
+    dataframe = DataFrame(0, columns=user_std, index=item_std)
+    for i in data_std:
+        dataframe[i[0]][i[1]] += int(i[2])
+
+    return dataframe
+
+
+def MovieLensRatings2Std(filepath, lines=None, users=None, items=None):
+    data_raw = ReadFile(filepath, lines=lines)
+    data_std = []
+    for i in data_raw:
+        j = i.split('::')
+        data_std.append(j)
 
     return data_std
 
+def MovieLensStd2Dataframe(data_std, users=None, items=None):
+    if not users and not items:
+        user_std, item_std = get_columns_and_index(data_std)
+    elif not users:
+        user_std = get_columns_and_index(data_std)[0]
+    elif not items:
+        item_std = get_columns_and_index(data_std)[1]
+    else:
+        user_std = users
+        item_std = items
 
+    dataframe = DataFrame(0, columns=user_std, index=item_std)
+    for i in data_std:
+        dataframe[i[0]][i[1]] += int(i[2])
 
+    return dataframe
 
 #三种主要结构的转换
 def UserInformation():

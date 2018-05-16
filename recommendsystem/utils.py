@@ -221,14 +221,13 @@ def list2dataframe_time(train, columns= None, index= None):
 
 #todo:该函数以来具体的数据格式
 #将数据集拆分成训练集和测试集的过程
-def SplitData(data, M=10, k=1, seed=0):
+def SplitData(data, M=10, k=1):
     test = []
     train = []
-    random.seed(seed)
-    for user, item in data:
+    for i in data:
         if random.randint(0,M) <= k:
             #randint随机生成0~M之间的数
-            test.append([user,item])
+            test.append(i)
         else:
-            train.append([user,item])
+            train.append(i)
     return train, test

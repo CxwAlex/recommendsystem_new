@@ -36,6 +36,9 @@ class ReadFileTest(unittest.TestCase):
         write_filepath = pwd + '/test_etl/testwrite.pkl'
         PickleWriteFile(read, write_filepath)
 
+    def test_write_log(self):
+        WriteLog()
+
 class MovieLensTest(unittest.TestCase):
 
     def test_rating2dataframe(self):

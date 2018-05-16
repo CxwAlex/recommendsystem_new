@@ -6,7 +6,7 @@ from recommendsystem.utils import count_set
 
 #计算余弦相似度
 def UserSimilarityCF(train):
-    w = DataFrame(0.0, index= train.columns, columns= train.columns)
+    w = DataFrame(0.0, index=train.columns, columns=train.columns)
     count_columns = train.apply(func=count_set, axis=0)
 
     for u in train.columns:
@@ -60,7 +60,7 @@ def UserSimilarityDownHotCF(train):
                     C[u][v] += 1
                     continue
                 C[u][v] += 1 / math.log(1 + len(users))
-
+    #print('计算完成C')
     w = DataFrame(0.0, index= train.columns, columns= train.columns)
     N = train.apply(func=count_set, axis=0)
 
@@ -72,6 +72,7 @@ def UserSimilarityDownHotCF(train):
             w[u][v] += C[u][v]
             if N[u] * N[v]:
                 w[u][v] /= math.sqrt(N[u] * N[v])
+    #print('计算完成W')
     return w
 
 
@@ -137,42 +138,56 @@ def ItemSimilarityDownHotCF(train):
     return W
 
 
-# userCF推荐算法
-def GetRankUserCF(train, user=None, k=1, similarity=None):
-    #W是用户之间的兴趣相似度, k是邻居数目
-    if similarity == 'downhot':
+def GetUserSimilarity(train, similarity_type=None):
+    if similarity_type == 'downhot':
         W = UserSimilarityDownHotCF(train)
     else:
         W = UserSimilarityCF(train)
 
+    return W
+
+
+def GetItemSimilarity(train, similarity_type=None):
+    if similarity_type == 'downhot':
+        W = ItemSimilarityDownHotCF(train)
+    else:
+        W = ItemSimilarityCF(train)
+
+    return W
+
+
+# userCF推荐算法
+def GetRankUserCF(train, user=None, k=1, user_similarity=None):
+    #W是用户之间的兴趣相似度, k是邻居数目
+    if not user_similarity:
+        user_similarity = UserSimilarityCF(train)
+
     if user:
         rank = Series(0.0, index=train.index)
-        for v in W[user].sort_values(ascending=False).index[1:k + 1]:
+        for v in user_similarity[user].sort_values(ascending=False).index[1:k + 1]:
             for i in train[v].index:
                 if train[v][i] == 0:
                     continue
                 else:
-                    rank[i] += W[user][v] * train[v][i]
+                    rank[i] += user_similarity[user][v] * train[v][i]
     else:
         rank = DataFrame(0.0, index=train.index, columns=train.columns)
         #u是目标用户，v是近邻用户，W[u][v]是相似度
         #i是物品编号，train[v][i]是v对i的兴趣
         for u in train.columns:
-            for v in W[u].sort_values(ascending=False).index[1:k+1]:
+            for v in user_similarity[u].sort_values(ascending=False).index[1:k+1]:
                 for i in train[v].index:
                     if train[v][i] == 0:
                         rank[u][i] += 0
                     else:
-                        rank[u][i] += W[u][v] * train[v][i]
+                        rank[u][i] += user_similarity[u][v] * train[v][i]
 
     return rank
 
 
-def GetRankItemCF(train, user=None, k=1, similarity=None):
+def GetRankItemCF(train, user=None, k=1, item_similarity=None):
     #首先获得物品相似度矩阵
-    if similarity == 'downhot':
-        item_similarity = ItemSimilarityDownHotCF(train)
-    else:
+    if not item_similarity:
         item_similarity = ItemSimilarityCF(train)
 
     #对用户列表里的每一个物品，计算其相关物品的推荐结果
@@ -210,39 +225,37 @@ def SortRank(rank, N=1):
             result[u] = rank[u].sort_values(ascending=False).index
     return result
 
+
+def FilterAndSort(train, rank, user=None, N=1):
+    if user:
+        for i in train.index[train[user] != 0]:
+            rank[i] = 0
+        result = SortRankUser(rank, N)
+    else:
+        for u in train.columns:
+            for i in train.index[train[u] != 0]:
+                rank[u][i] = 0
+        result = SortRank(rank, N)
+
+    return result
+
+
 #若排序则返回排序后的推荐结果，否则返回推荐分数矩阵
 #train是训练集，user是待推荐的用户，k是训练时的近邻个数，N是返回的推荐结果数
 def RecommendUserCF(train, user=None, k=1, N=1, similarity=None):
-    rank = GetRankUserCF(train, user, k, similarity)
-    #是否过滤掉已经有行为的物品
-    if user:
-        for i in train.index[train[user] != 0]:
-            rank[i] = 0
-        result = SortRankUser(rank, N)
-    else:
-        for u in train.columns:
-            for i in train.index[train[u] != 0]:
-                rank[u][i] = 0
-        result = SortRank(rank, N)
+    user_similarity = GetUserSimilarity(train, similarity)
+    rank = GetRankUserCF(train, user, k, user_similarity)
+    recommend = FilterAndSort(train, rank, user=None, N=1)
 
-    return result
+    return recommend
 
 
 def RecommendItemCF(train, user=None, k=1, N=1, similarity=None, sort=True):
-    rank = GetRankItemCF(train, user, k, similarity)
+    item_similarity = GetItemSimilarity(train, similarity)
+    rank = GetRankItemCF(train, user, k, item_similarity)
+    recommend = FilterAndSort(train, rank, user=None, N=1)
 
-    if user:
-        for i in train.index[train[user] != 0]:
-            rank[i] = 0
-        result = SortRankUser(rank, N)
-    else:
-        for u in train.columns:
-            for i in train.index[train[u] != 0]:
-                rank[u][i] = 0
-        result = SortRank(rank, N)
-
-    return result
-
+    return recommend
 
 
 #基于图的随机游走算法
