@@ -21,6 +21,8 @@ def TrainAndTestWorkflow(filepath, recommend_engine_name, dataset_name, user=Non
     #开始训练&写结果
     RecommendAndParameter(data_std, 'RecommendUserCF', repeat_k=10)
 
+    return None
+
 
 def RecommendAndParameter(data_std, recommend_engine, user=None, parameters=None, train_test_ratio=9, repeat_k=1):
     #以下写法是代码简洁版，但是在效率上较差
