@@ -1,118 +1,95 @@
-import numpy
+import pickle
+import os
 import random
 from pandas import Series, DataFrame
 from recommendsystem.utils import get_columns_and_index
 
+
+#数据读入模块
+def ReadFile(filepath, mode="r", lines=None):
+
+    with open(filepath, mode) as f:
+        read_result = f.readlines()[0:lines]
+        return read_result
+
+
+def WriteFile(data, filepath, mode='w'):
+    with open(filepath, mode) as f:
+        if isinstance(data, str):
+            num = f.write(data)
+        else:
+            str_data = str(data)
+            num = f.write(str_data)
+
+    return num
+
+
+def PickleReadFile(filepath):
+    with open(filepath, 'rb') as input:
+        data = pickle.load(input)
+    return data
+
+
+def PickleWriteFile(data, filepath):
+    with open(filepath, 'wb') as output:
+        pickle.dump(data, output)
+    #dump() 与 load() 相比 dumps() 和 loads() 还有另一种能力：
+    # dump()函数能一个接着一个地将几个对象序列化存储到同一个文件中
+    # 随后调用load()来以同样的顺序反序列化读出这些对象。
+    return None
+
+def WriteLog(data, filepath, mode='a'):
+    if not filepath:
+        pwd = os.getcwd()
+        project_filepath = os.path.abspath(os.path.dirname(pwd) + os.path.sep + "..")
+        filepath = project_filepath + '/Log/default.log'
+
+    num = WriteFile(data, filepath, mode)
+    return num
+
+#############################
+#以下是MovieLens数据的ETL
+#############################
+
+#适用于cf的数据集
+def MovieLensRatings2Dataframe(filepath, lines, users=None, items=None):
+    data_raw = ReadFile(filepath, lines=lines)
+    data_mid = []
+    for i in data_raw:
+        j = i.split('::')
+        data_mid.append(j)
+
+    if not users and not items:
+        user_std, item_std = get_columns_and_index(data_mid)
+    elif not users:
+        user_std = get_columns_and_index(data_mid)[0]
+    elif not items:
+        item_std = get_columns_and_index(data_mid)[1]
+    else:
+        user_std = users
+        item_std = items
+
+    data_std = DataFrame(0, columns=user_std, index=item_std)
+    for i in data_mid:
+        data_std[i[0]][i[1]] += int(i[2])
+
+    return data_std
+
+
+
+
 #三种主要结构的转换
 def UserInformation():
+    #具体情况具体实现
     return None
 
 def ItemInformation():
+    #具体情况具体实现
     return None
 
 def UserAction():
+    #具体情况具体实现
     return None
 
 
-#其他的就是不同格式之间的转换
-
-#engine_social用到的etl模块：matrix2dataframe, raw2std, graph2dataframe
-
-#根据具体的结构在完善，首先需要具备基础的将字典列表转换为dataframe的能力
-def matrix2dataframe(matrix):
-    if isinstance(matrix, dict):
-        result = DataFrame(matrix, index=matrix.keys())
-    elif isinstance(matrix, list):
-        result = DataFrame(matrix)
-    return result
-
-
-def graph2dataframe(graph):
-    result = DataFrame(0, columns=graph.keys(), index=graph.keys())
-    for u, v_list in graph.items():
-        for i in v_list:
-            result[u][i] = 1
-
-    return result
-
-
-#将原始的用户行为数据转化为标准化的矩阵格式
-def raw2std(raw_data,index=None):
-    mid_data = DataFrame(raw_data)
-    if isinstance(mid_data[mid_data.columns[0]][mid_data.index[0]], (numpy.int64, numpy.float64)):
-        if index:
-            result = DataFrame(raw_data, index= index)
-        else:
-            result = DataFrame(raw_data)
-    elif isinstance(mid_data[mid_data.columns[0]][mid_data.index[0]], str):
-        result = list2matrix(raw_data)
-    else:
-        raise TypeError("not support data formart")
-    #todo：三元组格式给出的结果
-    return result
-
-
-# 获得用户对哪些物品产生过行为
-# 将用户-物品表格转换为用户-物品-行为矩阵（0或1）
-def list2matrix(raw_data):
-    columns = []
-    index = []
-    for u, v_list in raw_data.items():
-        if u in columns:
-            pass
-        else:
-            columns.append(u)
-        for v in v_list:
-            if v in index:
-                pass
-            else:
-                index.append(v)
-
-    result = DataFrame(index= index, columns= columns)
-
-    for u, v_list in raw_data.items():
-        for i in index:
-            if i in v_list:
-                result[u][i] = 1
-            else:
-                result[u][i] = 0
-
-    return result
-
-
-#这个地方专管三元组的转换
-def list2dataframe_time(train, columns= None, index= None):
-    #todo:这个地方不太好写啊
-    #todo:1要对多种数据进行处理
-    #todo:2决定好到底要使用什么形式的矩阵
-    #列表套列表
-    if (not index) and (not columns):
-        columns, index = get_columns_and_index(train)
-    elif not columns:
-        columns = get_columns_and_index(train)[0]
-    elif not index:
-        index = get_columns_and_index(train)[1]
-
-    #单矩阵方案
-    user_item_time = DataFrame(index=index, columns=columns)
-    for a in train:
-        u=a[0]
-        i=a[1]
-        t=a[2]
-        user_item_time[u][i] = t
-    return user_item_time
-
-
-#将数据集拆分成训练集和测试集的过程
-def SplitData(data, M, k, seed=0):
-    test = []
-    train = []
-    random.seed(seed)
-    for user, item in data:
-        if random.randint(0,M) <= k:
-            #randint随机生成0~M之间的数
-            test.append([user,item])
-        else:
-            train.append([user,item])
-    return train, test
 

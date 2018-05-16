@@ -1,8 +1,7 @@
 # encoding=utf-8
 import unittest
-import time
 from recommendsystem.engine_time import *
-from recommendsystem.ETL import list2dataframe_time
+from recommendsystem.utils import list2dataframe_time
 
 #三元组
 
@@ -64,6 +63,7 @@ class ContextSimilarityTest(unittest.TestCase):
 
     def test_itemsimilarity(self):
         train = list2dataframe_time(raw_data)
+        print(train)
         dataframe1 = ItemSimilarityTime(train, 0.6)
         self.assertEqual(dataframe1[1][1], 0)
         self.assertEqual(dataframe1[4][3], 0.3125)
@@ -97,7 +97,6 @@ class ContextRecommendTest(unittest.TestCase):
     def test_recommend1(self):
         train = list2dataframe_time(raw_data1)
         result = RecommendItemSimilarityTime(train, k=3, N=5, t0=10)
-        print(result)
         self.assertEqual(result["user1"][0], "item3")
         train1 = list2dataframe_time(raw_data)
         rank1 = RecommendItemSimilarityTime(train1, N=5, t0=10)

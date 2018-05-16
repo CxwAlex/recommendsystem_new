@@ -1,29 +1,21 @@
-import numpy
-from pandas import Series, DataFrame
-from collections import defaultdict
-import random
-import math
-
-#实际上的多引擎并不单单只是指算法上的多引擎，更多的是指在业务上的：
-#比如专门负责冷启动的，专门负责重点广告业务的等，即常见的浏览器中其他文章+广告的模式
-
-#推荐系统核心模块，处理的是特征维度，而不仅仅是简单的行为、矩阵、图
-#对单一用户的推荐+推荐理由
-
-#todo:分成两部分，第一部分对单个用户进行推荐，第二部分对整个矩阵进行推荐
+from recommendsystem.ETL import MovieLensRatings2Dataframe
+from recommendsystem.utils import SplitData
+from recommendsystem.engine_cf import *
+from recommendsystem.engine_common import *
+from recommendsystem.engine_time import *
+from recommendsystem.engine_tags import *
+from recommendsystem.engine_social import *
 
 def ETL(raw_data, raw_schema, result_schema):
     return None
 
 def RecommendationCore(train,user,):
-    recommendation = {}
-    recommendation.add()
     #基于用户行为的推荐系统CF推荐系统引擎使用
     #recommend1 = RecommendUserCF(train, user=None, k=1, N=1, similarity=None, sort=True)
     #recommend2 = RecommendItemCF(train, user=None, k=1, N=1, similarity=None, sort=True)
 
     #基于社交网络的推荐系统的使用
-    #recommend3 = RecommendSocial(dataframe_social, dataframe_item, user=None, N=1)
+    #recommend3 = RecommendSocial(dataframe_social, dataframe_item, user=None, k=1, N=1)
     #推荐朋友
     #frend = FriendSuggestion(dataframe, user=None, N=1, filter=True)
 
@@ -38,13 +30,14 @@ def RecommendationCore(train,user,):
 
     #一些常用的推荐系统
     #最热门推荐
-    #
-    #最近最热门推荐
-    #
+    #recommend7 = RecommendMostHot(dataframe, N=1, type='day', date_now=None)
+    #分为当日最热门（day），一周(week)，一年(year)和所有记录（ever）
+
     #冷启动物品的推荐
-    #
+    #仅针对新物品或者冷门物品推荐
+    #recommend8 = RecommendColdStartItem(cold_items, N=1)
     #出于广告目的的推荐
-    #
+    #recommend9 = RecommendADs(ad_items, N=1)
 
     return recommendation
 
@@ -61,9 +54,10 @@ def Filter(train, recommendation, user=None):
 def Sort(recommendation, weight, user=None):
     for recommend in recommendation:
         for i in recommend:
-            result[i] = wi * wengine
-    result.sort
-    return result
+            continue
+            #result[i] = wi * wengine
+    #result.sort
+    return None
 
 def Reason(recommendation,recommendation_after_sort):
     for i in recommendation_after_sort:
@@ -72,6 +66,9 @@ def Reason(recommendation,recommendation_after_sort):
 
 
 if __name__ == '__main__':
+    #此处先对MovieLens的1M数据集进行测试，现阶段只考虑用户是否会对某部电影评分，而不考虑分数值
+    #使用的推荐引擎：随机、基于用户相似度、基于物品相似度、基于人口统计学的用户相似度，基于时间上下文的推荐
+
     train = ETL()
     recommendation = RecommendationCore()
     recommendation_after_filter = Filter(recommendation)

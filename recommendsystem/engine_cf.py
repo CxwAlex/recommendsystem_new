@@ -6,7 +6,7 @@ from recommendsystem.utils import count_set
 
 #计算余弦相似度
 def UserSimilarityCF(train):
-    w = DataFrame(index= train.columns, columns= train.columns)
+    w = DataFrame(0.0, index= train.columns, columns= train.columns)
     count_columns = train.apply(func=count_set, axis=0)
 
     for u in train.columns:
@@ -15,8 +15,9 @@ def UserSimilarityCF(train):
                 w[u][v] = 1
                 continue
 
-            w[u][v] = count_set(train[u] & train[v])
-            w[u][v] /= math.sqrt(count_columns[u] * count_columns[v] * 1.0)
+            w[u][v] += count_set(train[u] & train[v])
+            if count_columns[u] * count_columns[v]:
+                w[u][v] /= math.sqrt(count_columns[u] * count_columns[v])
     return w
 
 
@@ -37,13 +38,13 @@ def UserSimilarityBackCF(train):
                     C[u][v] += 1
 
     #calculate finial similarity matrix W
-    W = DataFrame(index=train_item_user.index, columns=train_item_user.index)
+    W = DataFrame(0.0, index=train_item_user.index, columns=train_item_user.index)
     for u in train_item_user.index:
         for v in train_item_user.index:
             if u == v:
-                W[u][v] = 1
-            else:
-                W[u][v] = C[u][v] / math.sqrt(N[u] * N[v])
+                W[u][v] += 1
+            elif N[u] * N[v]:
+                W[u][v] += C[u][v] / math.sqrt(N[u] * N[v])
     return W
 
 
@@ -60,16 +61,17 @@ def UserSimilarityDownHotCF(train):
                     continue
                 C[u][v] += 1 / math.log(1 + len(users))
 
-    w = DataFrame(index= train.columns, columns= train.columns)
+    w = DataFrame(0.0, index= train.columns, columns= train.columns)
     N = train.apply(func=count_set, axis=0)
 
     for u in train.columns:
         for v in train.columns:
             if u == v:
-                w[u][v] = 1
+                w[u][v] += 1
                 continue
-            w[u][v] = C[u][v]
-            w[u][v] /= math.sqrt(N[u] * N[v] * 1.0)
+            w[u][v] += C[u][v]
+            if N[u] * N[v]:
+                w[u][v] /= math.sqrt(N[u] * N[v])
     return w
 
 
@@ -93,7 +95,8 @@ def ItemSimilarityCF(train):
     W = DataFrame(0.0, index=train.index, columns=train.index)
     for i in train.index:
         for j in train.index:
-            W[i][j] = C[i][j] / math.sqrt(N[i] * N[j])
+            if N[i] * N[j]:
+                W[i][j] += C[i][j] / math.sqrt(N[i] * N[j])
     return W
 
 
@@ -129,7 +132,8 @@ def ItemSimilarityDownHotCF(train):
         for j in train.index:
             #归一化
             #W[i][j] = (C[i][j] / math.sqrt(N[i] * N[j]))/std_W[i]
-            W[i][j] = (C[i][j] / math.sqrt(N[i] * N[j]))
+            if N[i] * N[j]:
+                W[i][j] += (C[i][j] / math.sqrt(N[i] * N[j]))
     return W
 
 
