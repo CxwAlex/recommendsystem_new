@@ -12,14 +12,13 @@ class ReadFileTest(unittest.TestCase):
         read = ReadFile(read_filepath, lines=3)
         self.assertEqual(read[1], '1::661::3::978302109\n')
 
-
     def test_write_file(self):
         pwd = os.getcwd()
         read_filepath = pwd + '/test_etl/ratings.dat'
         data = ReadFile(read_filepath)
         write_filepath = pwd + '/test_etl/testwritefile.txt'
         num = WriteFile(data, write_filepath)
-        self.assertEqual(num, 29595176)
+        self.assertEqual(num, 266)
 
 
     def test_pickle_read_file(self):
@@ -47,7 +46,8 @@ class MovieLensTest(unittest.TestCase):
         read_filepath = pwd + '/test_etl/ratings.dat'
         read_lines = 100
         dataframe = MovieLensRatings2Dataframe(read_filepath, read_lines)
-        self.assertEqual(dataframe['1']['1'], 5)
+        print(dataframe)
+        self.assertEqual(dataframe['1']['594'], 4)
 
 
 
