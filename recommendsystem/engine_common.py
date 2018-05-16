@@ -86,6 +86,8 @@ def RecommendMostHotMonth(dataframe, N=1, date_now=None):
 
 #随机推荐引擎
 def RecommendRandom(items, N=1):
+    if isinstance(items, dict):
+        result = random.sample(list(items), N)
     result = random.sample(items, N)
     return result
 

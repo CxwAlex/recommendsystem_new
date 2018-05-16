@@ -1,4 +1,5 @@
 import math
+import time
 from pandas import Series, DataFrame
 from recommendsystem.engine_cf import ItemSimilarityCF
 
@@ -6,14 +7,40 @@ from recommendsystem.engine_cf import ItemSimilarityCF
 #其中，train是原始的训练集dataframe， recommend是推荐结果dataframe
 #test是测试集的dataframe或者多元组
 def Summary(train, recommend, test, item_similarity=None):
+    t0 = time.clock()
+
     recall = Recall(recommend, test)
+    t1 = time.clock()
+    time_recall = t1 - t0
+    print("recall:", recall, "   time_recall:", time_recall)
+
     precision = Precision(recommend, test)
+    t2 = time.clock()
+    time_precision = t2 - t1
+    print("precision:", precision, "   time_precision:", time_precision)
+
     coverage = Coverage(train, recommend)
+    t3 = time.clock()
+    time_coverage = t3 - t2
+    print("coverage:", coverage, "   time_coverage:", time_coverage)
+
     popularity = Popularity(train, recommend)
+    t4 = time.clock()
+    time_popularity = t4 - t3
+    print("popularity:", popularity, "   time_popularity:", time_popularity)
+
     novelty = Novelty(train, recommend)
-    if not item_similarity:
+    t5 = time.clock()
+    time_novelty = t5 - t4
+    print("novelty:", novelty, "   time_novelty:", time_novelty)
+
+    if not isinstance(item_similarity, DataFrame):
         item_similarity = ItemSimilarityCF(train)
     diversity = Diversity(recommend, item_similarity)
+    t6 = time.clock()
+    time_diversity = t6 - t5
+    print("diversity:", diversity, "   time_diversity:", time_diversity)
+
     '''
     index_all = ['recall', 'precision', 'coverage', 'popularity', 'novelty', 'diversity']
     result = Series(index=index_all)
@@ -24,8 +51,10 @@ def Summary(train, recommend, test, item_similarity=None):
     result['novelty'] = novelty
     result['diversity'] = diversity
     '''
+    time_all = t6 - t0
     result = {'recall':recall, 'precision':precision, 'coverage':coverage, 'popularity':popularity, 'novelty':novelty, 'diversity':diversity}
-    return result
+    spend_time = {'time_recall':time_recall, 'time_precision':time_precision, 'time_coverage':time_coverage, 'time_popularity':time_popularity, 'time_novelty':time_novelty, 'time_diversity':time_diversity, 'time_all':time_all}
+    return result, spend_time
 
 #计算准确率和召回率
 def Recall(recommend, test):

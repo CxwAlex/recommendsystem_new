@@ -1,4 +1,4 @@
-import numpy
+import time
 from pandas import Series, DataFrame
 import random
 import math
@@ -83,6 +83,7 @@ def ItemSimilarityCF(train):
     C = DataFrame(0.0, index=train.index, columns=train.index)
     N = train.apply(func=count_set, axis=1)
     for u in train.columns:
+        t0 = time.clock()
         items = train.index[train[u] != 0]
         for i in items:
             for j in items:
@@ -91,13 +92,18 @@ def ItemSimilarityCF(train):
                     C[i][j] += 1
                     continue
                 C[i][j] += 1
+        t1 = time.clock()
+        print(u,'done',t1-t0)
 
     #calculate finial similarity matrix W
     W = DataFrame(0.0, index=train.index, columns=train.index)
     for i in train.index:
+        t0 = time.clock()
         for j in train.index:
             if N[i] * N[j]:
                 W[i][j] += C[i][j] / math.sqrt(N[i] * N[j])
+        t1 = time.clock()
+        print('物品', i, 'done', t1-t0)
     return W
 
 
@@ -159,7 +165,7 @@ def GetItemSimilarity(train, similarity_type=None):
 # userCF推荐算法
 def GetRankUserCF(train, user=None, k=1, user_similarity=None):
     #W是用户之间的兴趣相似度, k是邻居数目
-    if not user_similarity:
+    if not isinstance(user_similarity, DataFrame):
         user_similarity = UserSimilarityCF(train)
 
     if user:
@@ -187,7 +193,7 @@ def GetRankUserCF(train, user=None, k=1, user_similarity=None):
 
 def GetRankItemCF(train, user=None, k=1, item_similarity=None):
     #首先获得物品相似度矩阵
-    if not item_similarity:
+    if not isinstance(item_similarity, DataFrame):
         item_similarity = ItemSimilarityCF(train)
 
     #对用户列表里的每一个物品，计算其相关物品的推荐结果
