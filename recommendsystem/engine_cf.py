@@ -10,6 +10,7 @@ def UserSimilarityCF(train):
     count_columns = train.apply(func=count_set, axis=0)
 
     for u in train.columns:
+        t0 = time.clock()
         for v in train.columns:
             if u == v:
                 w[u][v] = 1
@@ -18,34 +19,9 @@ def UserSimilarityCF(train):
             w[u][v] += count_set(train[u] & train[v])
             if count_columns[u] * count_columns[v]:
                 w[u][v] /= math.sqrt(count_columns[u] * count_columns[v])
+        t1 = time.clock()
+        print(u, 'done', t1 - t0)
     return w
-
-
-#利用倒排方法计算用户相似度
-def UserSimilarityBackCF(train):
-    train_item_user = train.T
-    #calculate co-rated items between users
-    #C表示u和v对拥有相同兴趣的物品数
-    #N表示用户对物品产生行为的个数
-    N = train_item_user.apply(func=count_set, axis=1)
-    C = DataFrame(0, index=train.columns, columns=train.columns)
-    for item in train_item_user.columns:
-        for u in train_item_user.index:
-            for v in train_item_user.index:
-                if train_item_user[item][u] == 0 or train_item_user[item][v] == 0 or u == v:
-                    continue
-                else:
-                    C[u][v] += 1
-
-    #calculate finial similarity matrix W
-    W = DataFrame(0.0, index=train_item_user.index, columns=train_item_user.index)
-    for u in train_item_user.index:
-        for v in train_item_user.index:
-            if u == v:
-                W[u][v] += 1
-            elif N[u] * N[v]:
-                W[u][v] += C[u][v] / math.sqrt(N[u] * N[v])
-    return W
 
 
 #惩罚了共同兴趣中的热门物品后的user-II的相似度计算
@@ -53,6 +29,7 @@ def UserSimilarityDownHotCF(train):
     #calculate co-rated items between users
     C = DataFrame(0.0, index=train.columns, columns=train.columns)
     for item in train.index:
+        t0 = time.clock()
         users = train.columns[train.ix[item] != 0]
         for u in users:
             for v in users:
@@ -60,11 +37,16 @@ def UserSimilarityDownHotCF(train):
                     C[u][v] += 1
                     continue
                 C[u][v] += 1 / math.log(1 + len(users))
+
+        t1 = time.clock()
+        print(item, 'done', t1 - t0)
+
     #print('计算完成C')
     w = DataFrame(0.0, index= train.columns, columns= train.columns)
     N = train.apply(func=count_set, axis=0)
 
     for u in train.columns:
+        t0 = time.clock()
         for v in train.columns:
             if u == v:
                 w[u][v] += 1
@@ -72,6 +54,9 @@ def UserSimilarityDownHotCF(train):
             w[u][v] += C[u][v]
             if N[u] * N[v]:
                 w[u][v] /= math.sqrt(N[u] * N[v])
+        t1 = time.clock()
+        print(u, 'done', t1 - t0)
+
     #print('计算完成W')
     return w
 
@@ -93,7 +78,7 @@ def ItemSimilarityCF(train):
                     continue
                 C[i][j] += 1
         t1 = time.clock()
-        print(u,'done',t1-t0)
+        print(u, 'done', t1-t0)
 
     #calculate finial similarity matrix W
     W = DataFrame(0.0, index=train.index, columns=train.index)
@@ -103,7 +88,7 @@ def ItemSimilarityCF(train):
             if N[i] * N[j]:
                 W[i][j] += C[i][j] / math.sqrt(N[i] * N[j])
         t1 = time.clock()
-        print('物品', i, 'done', t1-t0)
+        print(i, 'done', t1-t0)
     return W
 
 
@@ -122,6 +107,7 @@ def ItemSimilarityDownHotCF(train):
         users[item] = train.columns[train.ix[item] != 0]
 
     for u in train.columns:
+        t0 = time.clock()
         items = train.index[train[u] != 0]
         for i in items:
             for j in items:
@@ -129,11 +115,14 @@ def ItemSimilarityDownHotCF(train):
                 #    C[i][j] += 1
                 #   continue
                 C[i][j] += 1 / math.log(1 + len(items) * 1.0)
+        t1 = time.clock()
+        print(u, 'done', t1 - t0)
 
     # calculate finial similarity matrix W
     W = DataFrame(0.0, index=train.index, columns=train.index)
     std_W = Series(0.0,index= train.index)
     for i in train.index:
+        t0 = time.clock()
         #下面是针对每一列进行归一化，但是会导致矩阵不对称问题
         #std_W[i] = C[i][i] / math.sqrt(N[i] * N[i])
         for j in train.index:
@@ -141,6 +130,9 @@ def ItemSimilarityDownHotCF(train):
             #W[i][j] = (C[i][j] / math.sqrt(N[i] * N[j]))/std_W[i]
             if N[i] * N[j]:
                 W[i][j] += (C[i][j] / math.sqrt(N[i] * N[j]))
+        t1 = time.clock()
+        print(i, 'done', t1 - t0)
+
     return W
 
 
@@ -296,3 +288,33 @@ def PersonalRank(train, p, N, is_P=True, filter_item=True):
                 result[u][i] += 1
 
     return result
+
+'''
+#利用倒排方法计算用户相似度
+def UserSimilarityBackCF(train):
+    train_item_user = train.T
+    #calculate co-rated items between users
+    #C表示u和v对拥有相同兴趣的物品数
+    #N表示用户对物品产生行为的个数
+    N = train_item_user.apply(func=count_set, axis=1)
+    C = DataFrame(0, index=train.columns, columns=train.columns)
+    for item in train_item_user.columns:
+        for u in train_item_user.index:
+            for v in train_item_user.index:
+                if train_item_user[item][u] == 0 or train_item_user[item][v] == 0 or u == v:
+                    continue
+                else:
+                    C[u][v] += 1
+
+    #calculate finial similarity matrix W
+    W = DataFrame(0.0, index=train_item_user.index, columns=train_item_user.index)
+    for u in train_item_user.index:
+        for v in train_item_user.index:
+            if u == v:
+                W[u][v] += 1
+            elif N[u] * N[v]:
+                W[u][v] += C[u][v] / math.sqrt(N[u] * N[v])
+    return W
+
+
+'''

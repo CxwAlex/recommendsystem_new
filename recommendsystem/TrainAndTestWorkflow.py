@@ -167,8 +167,8 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, user=None, parame
 
         if parameters:
             for N in parameters['N']:
+                log_name = recommend_engine + '_N=' + str(N)
                 result_str = 'setting: N=' + str(N)
-                WriteParameterSettingToLog(result_str, recommend_engine)
                 for i in range(repeat_k):
                     t2 = time.clock()
                     recommend = DataFrame(columns=data_all.columns, index=range(N))
@@ -182,7 +182,7 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, user=None, parame
                     time_summary = t4 - t3
 
                     time_all = {'time_stddata': time_stddata, 'time_similarity': time_similarity, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                    WriteSummaryToLog(time_all, summary, spendtime_summary, i, recommend_engine)
+                    WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
 
     return None
 
