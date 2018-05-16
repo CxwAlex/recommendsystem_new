@@ -10,7 +10,7 @@ from recommendsystem.TrainAndTestWorkflow import *
 class RecommendAndParameterTest(unittest.TestCase):
     def test_random1k(self):
         read_filepath = project_filepath + '/dataset/MovieLens/1m/ratings_1kuser.dat'
-        data_std = MovieLensRatings2Std(read_filepath, lines=100)
+        data_std = MovieLensRatings2Std(read_filepath)
         recommend_engine = 'RecommendUserCF'
         dataset_name = 'MovieLens1M'
         parameters = getparaters(dataset_name, recommend_engine)
@@ -19,7 +19,7 @@ class RecommendAndParameterTest(unittest.TestCase):
 
     def test_random100(self):
         read_filepath = project_filepath + '/dataset/MovieLens/1m/ratings_100user.dat'
-        data_std = MovieLensRatings2Std(read_filepath, lines=100)
+        data_std = MovieLensRatings2Std(read_filepath)
         recommend_engine = 'RecommendUserCF'
         dataset_name = 'MovieLens1M'
         parameters = getparaters(dataset_name, recommend_engine)
