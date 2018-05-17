@@ -1,5 +1,9 @@
 import unittest
 import os
+import sys
+pwd = os.getcwd()
+project_filepath = os.path.abspath(os.path.dirname(pwd) + os.path.sep + "..")
+sys.path.append(project_filepath)
 from recommendsystem.ETL import *
 
 
@@ -41,6 +45,15 @@ class ReadFileTest(unittest.TestCase):
 class MovieLensTest(unittest.TestCase):
 
     def test_rating2dataframe(self):
+        # 当前文件的路径
+        pwd = os.getcwd()
+        read_filepath = pwd + '/test_etl/ratings.dat'
+        read_lines = 100
+        dataframe = MovieLensRatings2Dataframe(read_filepath, read_lines)
+        print(dataframe)
+        self.assertEqual(dataframe['1']['594'], 4)
+
+    def test_movie_tag2std(self):
         # 当前文件的路径
         pwd = os.getcwd()
         read_filepath = pwd + '/test_etl/ratings.dat'

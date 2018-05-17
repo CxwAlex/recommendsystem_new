@@ -60,13 +60,15 @@ etl模块：负责将原始数据格式转换成内部所使用的dataframe格�
 
 云服务器消息：
 num1:usercf, 100
-num2:itemcf, 100
+num2:usercf, 1000
 num3:personalrank
-num4:usercf, 1000
+num4:itemcf, 100
 num5:itemcf, 1000
 num6:user_property
-num7:item_tags
+num7:random
+num8:mosthot
 
+num7:item_tags
 num8:usercf+user_property
 num9:itemcf+item_tags
 
