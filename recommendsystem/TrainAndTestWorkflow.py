@@ -169,17 +169,48 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=Non
 
                             time_all = {'time_stddata': time_stddata, 'time_item_similarity': time_item_similarity, 'time_user_similarity': time_user_similarity,  'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
                             WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i=1)
+
+    elif recommend_engine == 'RecommendByTags':
+        t0 = time.clock()
+        item_similarity = ItemSimilarityTagsList(data_std_item)
+        t1 = time.clock()
+        time_item_similarity = t1 - t0
+
+        for i in range(repeat_k):
+            t2 = time.clock()
+            train, test = DataStd2Dataframe(data_std, train_test_ratio)
+            t3 = time.clock()
+            time_stddata = t3 - t2
+
+            if parameters:
+                for k in parameters['k']:
+                    t5 = time.clock()
+                    rank = GetRankItemCF(train, user, k, item_similarity)
+                    t6 = time.clock()
+                    time_rank = t6 - t5
+
+                    for N in parameters['N']:
+                        t7 = time.clock()
+                        recommend = FilterAndSort(train, rank, user, N)
+                        t8 = time.clock()
+                        time_recommend = t8 - t7
+
+                        log_name = recommend_engine + "_k=" + str(k) + '_N=' + str(N)
+
+                        summary, spendtime_summary = Summary(train, recommend, test, item_similarity)
+                        t9 = time.clock()
+                        time_summary = t9 - t8
+
+                        time_all = {'time_stddata': time_stddata, 'time_item_similarity': time_item_similarity, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
+                        WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i=1)
+
+
     #social暂不使用，因为没有社交属性数据
     #elif recommend_engine == 'RecommendSocial':
     #   if parameters:
     #        for k in parameters['k']:
     #            for N in parameters['N']:
     #                recommend = RecommendSocial(dataframe_social, dataframe_item, user=None, k=k, N=N)
-    #tags暂时不用
-    #elif recommend_engine == 'RecommendByTags':
-    #    if parameters:
-    #        for N in parameters['N']:
-    #            recommend = RecommendByTags(user_item_tags, user=None, N=N)
     #elif recommend_engine == 'RecommendItemSimilarityTime':
     #    if parameters:
     #        for k in parameters['k']:

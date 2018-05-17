@@ -53,6 +53,9 @@ def MovieLens1MParameters(recommend_engine):
         parameters['p'] = [0.5, 0.7, 0.8]
         parameters['repeat_times'] = [100, 1000]
         parameters['N'] = [5, 10, 16]
+    elif recommend_engine == 'RecommendByTags':
+        parameters['p'] = [0.5, 0.7, 0.8]
+        parameters['N'] = [5, 10, 16]
     elif recommend_engine == 'RecommendUserProperty':
         parameters['k'] = [5, 10, 20, 40]
         parameters['N'] = [5, 10, 16]
