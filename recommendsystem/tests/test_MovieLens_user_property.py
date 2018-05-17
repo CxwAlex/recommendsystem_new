@@ -10,9 +10,9 @@ class RecommendAndParameterTest(unittest.TestCase):
     '''
     def test_user1k(self):
         read_filepath = project_filepath + '/dataset/MovieLens/1m/ratings_1kuser.dat'
-        data_std = MovieLensRatings2Std(read_filepath, lines=100)
+        data_std = MovieLensRatings2Std(read_filepath)
         read_filepath_users = project_filepath + '/dataset/MovieLens/1m/users.dat'
-        data_std_user = MovieLensRatings2Std(read_filepath_users, lines=100)
+        data_std_user = MovieLensRatings2Std(read_filepath_users, lines=1000)
         recommend_engine = 'RecommendUserProperty'
         dataset_name = 'MovieLens1M'
         parameters = getparaters(dataset_name, recommend_engine)
