@@ -39,7 +39,7 @@ def UserSimilarityDownHotCF(train):
                 C[u][v] += 1 / math.log(1 + len(users))
 
         t1 = time.clock()
-        print(item, 'done', t1 - t0)
+        print('usercf_downhot', item, 'done', t1 - t0)
 
     #print('计算完成C')
     w = DataFrame(0.0, index= train.columns, columns= train.columns)
@@ -55,7 +55,7 @@ def UserSimilarityDownHotCF(train):
             if N[u] * N[v]:
                 w[u][v] /= math.sqrt(N[u] * N[v])
         t1 = time.clock()
-        print(u, 'done', t1 - t0)
+        print('usercf_downhot', u, 'done', t1 - t0)
 
     #print('计算完成W')
     return w
@@ -78,7 +78,7 @@ def ItemSimilarityCF(train):
                     continue
                 C[i][j] += 1
         t1 = time.clock()
-        print(u, 'done', t1-t0)
+        print('itemcf', u, 'done', t1-t0)
 
     #calculate finial similarity matrix W
     W = DataFrame(0.0, index=train.index, columns=train.index)
@@ -88,7 +88,7 @@ def ItemSimilarityCF(train):
             if N[i] * N[j]:
                 W[i][j] += C[i][j] / math.sqrt(N[i] * N[j])
         t1 = time.clock()
-        print(i, 'done', t1-t0)
+        print('itemcf', i, 'done', t1-t0)
     return W
 
 
@@ -116,7 +116,7 @@ def ItemSimilarityDownHotCF(train):
                 #   continue
                 C[i][j] += 1 / math.log(1 + len(items) * 1.0)
         t1 = time.clock()
-        print(u, 'done', t1 - t0)
+        print('itemcf_downhot', u, 'done', t1 - t0)
 
     # calculate finial similarity matrix W
     W = DataFrame(0.0, index=train.index, columns=train.index)
@@ -131,7 +131,7 @@ def ItemSimilarityDownHotCF(train):
             if N[i] * N[j]:
                 W[i][j] += (C[i][j] / math.sqrt(N[i] * N[j]))
         t1 = time.clock()
-        print(i, 'done', t1 - t0)
+        print('itemcf_downhot', i, 'done', t1 - t0)
 
     return W
 
@@ -158,7 +158,6 @@ def GetItemSimilarity(train, similarity_type=None):
 def GetRankUserCF(train, user=None, k=1, user_similarity=None):
     #W是用户之间的兴趣相似度, k是邻居数目
     if not isinstance(user_similarity, DataFrame):
-        print('不是dataframe')
         user_similarity = UserSimilarityCF(train)
 
     if user:

@@ -28,7 +28,4 @@ class RecommendAndParameterTest(unittest.TestCase):
         recommend_engine = 'RecommendUserProperty'
         dataset_name = 'MovieLens1M'
         parameters = getparaters(dataset_name, recommend_engine)
-        print(parameters)
-        print(data_std_user)
-
         RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=data_std_user, repeat_k=10, parameters=parameters)

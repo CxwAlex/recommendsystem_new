@@ -31,95 +31,76 @@ def TrainAndTestWorkflow(filepath, user_filepath, item_filepath, recommend_engin
 def RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=None, data_std_item=None, user=None, parameters=None, train_test_ratio=9, repeat_k=1):
     #以下写法把每个推荐引擎拆开来，对其可重复利用的部分进行重复利用
     if recommend_engine == 'RecommendUserCF':
-        if parameters:
-            for similarity in parameters['similarity']:
-                for i in range(repeat_k):
-                    t0 = time.clock()
-                    train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                    t1 = time.clock()
-                    time_stddata = t1 - t0
+        for i in range(repeat_k):
+            t0 = time.clock()
+            train, test = DataStd2Dataframe(data_std, train_test_ratio)
+            t1 = time.clock()
+            time_stddata = t1 - t0
 
+            item_similarity = GetUserSimilarity(train)
+            t2 = time.clock()
+            time_item_similarity = t2 - t1
+
+            if parameters:
+                for similarity in parameters['similarity']:
+                    t3 = time.clock()
                     user_similarity = GetUserSimilarity(train, similarity)
-                    t2 = time.clock()
-                    time_similarity = t2 - t1
+                    t4 = time.clock()
+                    time_user_similarity = t4 - t3
 
                     for k in parameters['k']:
+                        t5 = time.clock()
                         rank = GetRankUserCF(train, user, k, user_similarity)
+                        t6 = time.clock()
+                        time_rank = t6 - t5
+
+
                         for N in parameters['N']:
                             log_name = recommend_engine + "_k=" + str(k) + '_N=' + str(N) + '_similarity=' + similarity
+                            t7 = time.clock()
                             recommend = FilterAndSort(train, rank, user, N)
-                            t3 = time.clock()
-                            time_recommend = t3 - t2
+                            t8 = time.clock()
+                            time_recommend = t8 - t7
 
-                            summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                            t4 = time.clock()
-                            time_summary = t4 - t3
-                            time_all = {'time_stddata': time_stddata, 'time_similarity': time_similarity, 'time_recommend': time_recommend, 'time_summary': time_summary}
+                            summary, spendtime_summary = Summary(train, recommend, test, item_similarity)
+                            t9 = time.clock()
+                            time_summary = t9 - t8
+                            time_all = {'time_stddata': time_stddata, 'time_item_similarity': time_item_similarity, 'time_user_similarity': time_user_similarity, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
                             WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
-        else:
-            for i in range(repeat_k):
-                t0 = time.clock()
-                train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                t1 = time.clock()
-                time_stddata = t1 - t0
-
-                recommend = RecommendUserCF(train, user)
-                t2 = time.clock()
-                time_recommend = t2 - t1
-
-                summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                t3 = time.clock()
-                time_summary = t3 - t2
-
-                log_name = recommend_engine
-                time_all = {'time_stddata': time_stddata, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
 
     elif recommend_engine == 'RecommendItemCF':
-        if parameters:
-            for similarity in parameters['similarity']:
-                for i in range(repeat_k):
-                    t0 = time.clock()
-                    train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                    t1 = time.clock()
-                    time_stddata = t1 - t0
+        for i in range(repeat_k):
+            t0 = time.clock()
+            train, test = DataStd2Dataframe(data_std, train_test_ratio)
+            t1 = time.clock()
+            time_stddata = t1 - t0
 
-                    item_similarity = GetItemSimilarity(train, similarity)
+            if parameters:
+                for similarity in parameters['similarity']:
                     t2 = time.clock()
-                    time_similarity = t2 - t1
+                    item_similarity = GetItemSimilarity(train, similarity)
+                    t3 = time.clock()
+                    time_similarity = t3 - t2
 
                     for k in parameters['k']:
+                        t4 = time.clock()
                         rank = GetRankItemCF(train, user, k, item_similarity)
+                        t5 = time.clock()
+                        time_rank = t5 - t4
+
                         for N in parameters['N']:
                             log_name = recommend_engine + "_k=" + str(k) + '_N=' + str(N) + '_similarity=' + similarity
 
+                            t5 = time.clock()
                             recommend = FilterAndSort(train, rank, user, N)
-                            t3 = time.clock()
-                            time_recommend = t3 - t2
+                            t6 = time.clock()
+                            time_recommend = t6 - t5
 
-                            summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                            t4 = time.clock()
-                            time_summary = t4 - t3
-                            time_all = {'time_stddata': time_stddata, 'time_similarity': time_similarity,'time_recommend': time_recommend, 'time_summary': time_summary}
+                            summary, spendtime_summary = Summary(train, recommend, test, item_similarity)
+                            t7 = time.clock()
+                            time_summary = t7 - t6
+                            time_all = {'time_stddata': time_stddata, 'time_similarity': time_similarity, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
                             WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
-        else:
-            for i in range(repeat_k):
-                t0 = time.clock()
-                train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                t1 = time.clock()
-                time_stddata = t1 - t0
-
-                recommend = RecommendItemCF(train, user)
-                t2 = time.clock()
-                time_recommend = t2 - t1
-
-                summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                t3 = time.clock()
-                time_summary = t3 - t2
-
-                log_name = recommend_engine
-                time_all = {'time_stddata': time_stddata, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
 
     elif recommend_engine == 'RecommendPersonalRank':
         t0 = time.clock()
@@ -149,85 +130,45 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=Non
 
                         time_all = {'time_stddata': time_stddata, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
                         WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i=1)
-        else:
-            for i in range(repeat_k):
-                t0 = time.clock()
-                train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                t1 = time.clock()
-                time_stddata = t1 - t0
-
-                rank = PersonalRank(train, user)
-                t2 = time.clock()
-                time_rank = t2 - t1
-
-                recommend = FilterAndSort(train, rank, user, N=1)
-                t3 = time.clock()
-                time_recommend = t3 - t2
-
-                summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                t4 = time.clock()
-                time_summary = t4 - t2
-
-                log_name = recommend_engine
-                time_all = {'time_stddata': time_stddata, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
 
     elif recommend_engine == 'RecommendUserProperty':
-        if parameters:
-            for weight in parameters['weight']:
-                t0 = time.clock()
-                user_similarity = UserSimilarityProperty(data_std_user, weight)
-                t1 = time.clock()
-                time_similarity = t1 - t0
+        for i in range(repeat_k):
+            t0 = time.clock()
+            train, test = DataStd2Dataframe(data_std, train_test_ratio)
+            t1 = time.clock()
+            time_stddata = t1 - t0
 
-                for k in parameters['k']:
-                    for i in range(repeat_k):
-                        t1 = time.clock()
-                        train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                        t2 = time.clock()
-                        time_stddata = t2 - t1
+            item_similarity = GetItemSimilarity(train)
+            t2 = time.clock()
+            time_item_similarity = t2 - t1
 
+            if parameters:
+                for weight in parameters['weight']:
+                    t3 = time.clock()
+                    user_similarity = UserSimilarityProperty(data_std_user, weight)
+                    t4 = time.clock()
+                    time_user_similarity = t4 - t3
+
+                    for k in parameters['k']:
+                        t5 = time.clock()
                         rank = GetRankUserCF(train, user, k, user_similarity)
-                        t3 = time.clock()
-                        time_rank = t3 - t2
+                        t6 = time.clock()
+                        time_rank = t6 - t5
+
                         for N in parameters['N']:
-                            t4 = time.clock()
+                            t7 = time.clock()
                             recommend = FilterAndSort(train, rank, user, N)
-                            t5 = time.clock()
-                            time_recommend = t5 - t4
+                            t8 = time.clock()
+                            time_recommend = t8 - t7
 
                             log_name = recommend_engine + "_k=" + str(k) + '_N=' + str(N) + '_weight=' + str(weight)
 
-                            summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                            t6 = time.clock()
-                            time_summary = t6 - t5
+                            summary, spendtime_summary = Summary(train, recommend, test, item_similarity)
+                            t9 = time.clock()
+                            time_summary = t9 - t8
 
-                            time_all = {'time_similarity': time_similarity, 'time_stddata': time_stddata, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
+                            time_all = {'time_stddata': time_stddata, 'time_item_similarity': time_item_similarity, 'time_user_similarity': time_user_similarity,  'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
                             WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i=1)
-        else:
-            for i in range(repeat_k):
-                t0 = time.clock()
-                train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                t1 = time.clock()
-                time_stddata = t1 - t0
-
-                rank = PersonalRank(train, user)
-                t2 = time.clock()
-                time_rank = t2 - t1
-
-                recommend = FilterAndSort(train, rank, user, N=1)
-                t3 = time.clock()
-                time_recommend = t3 - t2
-
-                summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                t4 = time.clock()
-                time_summary = t4 - t2
-
-                log_name = recommend_engine
-                time_all = {'time_stddata': time_stddata, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
-
-
     #social暂不使用，因为没有社交属性数据
     #elif recommend_engine == 'RecommendSocial':
     #   if parameters:
@@ -329,184 +270,3 @@ def Result2Log(log_name, result):
     num = WriteLog(result, filepath)
 
     return num
-
-
-'''
-
-def WriteEngineToLog(recommend_engine):
-    date = datetime.datetime.now()
-
-    num0 = Result2Log('engine_start_time'+str(date), recommend_engine)
-    num1 = Result2Log(recommend_engine, recommend_engine)
-
-    print(recommend_engine)
-    print('start_time', date)
-    return num1
-
-
-def WriteParameterSettingToLog(result_str2, recommend_engine):
-    date = datetime.datetime.now()
-    num0 = Result2Log('new_setting_start_time'+str(date), recommend_engine)
-    num2 = Result2Log(result_str2, recommend_engine)
-    print(result_str2)
-
-    return num2
-
-
-def RecommendAndParameter(data_std, recommend_engine, user=None, parameters=None, train_test_ratio=9, repeat_k=1):
-    #以下写法是代码简洁版，但是在效率上较差
-    WriteEngineToLog(recommend_engine)
-    if recommend_engine == 'RecommendUserCF':
-        if parameters:
-            for k in parameters['k']:
-                for similarity in parameters['similarity']:
-                    for N in parameters['N']:
-                        result_str = 'setting: k=' + str(k) + ', N=' + str(N) + ', similarity=' + similarity
-                        WriteParameterSettingToLog(result_str, recommend_engine)
-                        for i in range(repeat_k):
-                            t0 = time.clock()
-                            train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                            t1 = time.clock()
-                            time_stddata = t1 - t0
-
-                            recommend = RecommendUserCF(train, user=user, k=k, N=N, similarity=similarity)
-                            t2 = time.clock()
-                            time_recommend = t2 - t1
-
-                            summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                            t3 = time.clock()
-                            time_summary = t3 - t2
-
-                            time_all = {'time_stddata':time_stddata, 'time_recommend':time_recommend, 'time_summary':time_summary}
-                            WriteSummaryToLog(time_all, summary, spendtime_summary, i, recommend_engine)
-
-        else:
-            for i in range(repeat_k):
-                t0 = time.clock()
-                train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                t1 = time.clock()
-                time_stddata = t1 - t0
-
-                recommend = RecommendUserCF(train, user)
-                t2 = time.clock()
-                time_recommend = t2 - t1
-
-                summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                t3 = time.clock()
-                time_summary = t3 - t2
-
-                time_all = {'time_stddata': time_stddata, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                WriteSummaryToLog(time_all, summary, spendtime_summary, i, recommend_engine)
-
-    elif recommend_engine == 'RecommendItemCF':
-        if parameters:
-            for k in parameters['k']:
-                for similarity in parameters['similarity']:
-                    for N in parameters['N']:
-                        result_str = 'setting: k=' + str(k) + ', N=' + str(N) + ', similarity=' + similarity
-                        WriteParameterSettingToLog(result_str, recommend_engine)
-                        for i in range(repeat_k):
-                            t0 = time.clock()
-                            train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                            t1 = time.clock()
-                            time_stddata = t1 - t0
-
-                            recommend = RecommendItemCF(train, user=user, k=k, N=N, similarity=similarity)
-                            t2 = time.clock()
-                            time_recommend = t2 - t1
-
-                            summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                            t3 = time.clock()
-                            time_summary = t3 - t2
-
-                            time_all = {'time_stddata': time_stddata, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                            WriteSummaryToLog(time_all, summary, spendtime_summary, i, recommend_engine)
-
-        else:
-            for i in range(repeat_k):
-                t0 = time.clock()
-                train, test = DataStd2Dataframe(data_std, train_test_ratio)
-                t1 = time.clock()
-                time_stddata = t1 - t0
-
-                recommend = RecommendItemCF(train, user)
-                t2 = time.clock()
-                time_recommend = t2 - t1
-
-                summary, spendtime_summary = Summary(train, recommend, test, item_similarity=None)
-                t3 = time.clock()
-                time_summary = t3 - t2
-
-                time_all = {'time_stddata': time_stddata, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                WriteSummaryToLog(time_all, summary, spendtime_summary, i, recommend_engine)
-
-    #social暂不使用，因为没有社交属性数据
-    #elif recommend_engine == 'RecommendSocial':
-    #   if parameters:
-    #        for k in parameters['k']:
-    #            for N in parameters['N']:
-    #                recommend = RecommendSocial(dataframe_social, dataframe_item, user=None, k=k, N=N)
-    #tags暂时不用
-    #elif recommend_engine == 'RecommendByTags':
-    #    if parameters:
-    #        for N in parameters['N']:
-    #            recommend = RecommendByTags(user_item_tags, user=None, N=N)
-    #elif recommend_engine == 'RecommendItemSimilarityTime':
-    #    if parameters:
-    #        for k in parameters['k']:
-    #            for N in parameters['N']:
-    #                recommend = RecommendUserCF(train, user=user, k=k, N=N)
-    #elif recommend_engine == 'RecommendUserSimilarityTime':
-    #    if parameters:
-    #        for k in parameters['k']:
-    #            for N in parameters['N']:
-    #                recommend = RecommendUserCF(train, user=user, k=k, N=N)
-    #elif recommend_engine == 'RecommendMostHot':
-    #    if parameters:
-    #        for k in parameters['k']:
-    #            for N in parameters['N']:
-    #                recommend = RecommendUserCF(train, user=user, k=k, N=N)
-    #elif recommend_engine == 'RecommendColdStartItem':
-    #    if parameters:
-    #        for k in parameters['k']:
-    #            for N in parameters['N']:
-    #                recommend = RecommendUserCF(train, user=user, k=k, N=N)
-    elif recommend_engine == 'RecommendRandom':
-        t0 = time.clock()
-
-        data_all = MovieLensStd2Dataframe(data_std)
-        t1 = time.clock()
-        time_stddata = t1 - t0
-
-        print('start_similarity')
-        item_similarity = GetItemSimilarity(data_all)
-        t2 = time.clock()
-        time_similarity = t2 - t1
-        print('end_similarity', time_similarity)
-
-
-        if parameters:
-            for N in parameters['N']:
-                result_str = 'setting: N=' + str(N)
-                WriteParameterSettingToLog(result_str, recommend_engine)
-                for i in range(repeat_k):
-                    t2 = time.clock()
-                    recommend = DataFrame(columns=data_all.columns, index=range(N))
-                    for u in data_all.columns:
-                        recommend[u] = RecommendRandom(list(data_all.index), N)
-                    t3 = time.clock()
-                    time_recommend = t3 - t2
-
-                    summary, spendtime_summary = Summary(data_all, recommend, data_all, item_similarity)
-                    t4 = time.clock()
-                    time_summary = t4 - t3
-
-                    time_all = {'time_stddata': time_stddata, 'time_similarity': time_similarity, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                    WriteSummaryToLog(time_all, summary, spendtime_summary, i, recommend_engine)
-
-    return None
-
-
-
-
-'''

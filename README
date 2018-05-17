@@ -58,3 +58,21 @@ etl模块：负责将原始数据格式转换成内部所使用的dataframe格�
 7. 基于社交网络
 8. 融合推荐系统的性能
 
+云服务器消息：
+num1:usercf, 100
+num2:itemcf, 100
+num3:personalrank
+num4:usercf, 1000
+num5:itemcf, 1000
+num6:user_property
+num7:item_tags
+
+num8:usercf+user_property
+num9:itemcf+item_tags
+
+num10:user_time:100
+num11:item_time:100
+
+
+之前的部分引擎
+时间+计算逻辑不合理
