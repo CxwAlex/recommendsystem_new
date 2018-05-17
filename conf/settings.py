@@ -71,7 +71,7 @@ def MovieLens1MParameters(recommend_engine):
         parameters['k'] = [5, 10, 20, 40]
         parameters['N'] = [5, 10, 16]
     elif recommend_engine == 'RecommendMostHot':
-        parameters[type] = ['day', 'week', 'month', 'ever']
+        #parameters[type] = ['day', 'week', 'month', 'ever']
         parameters['N'] = [5, 10, 16]
     elif recommend_engine == 'RecommendRandom':
         parameters['N'] = [5, 10, 16]

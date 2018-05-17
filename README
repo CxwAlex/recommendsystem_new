@@ -66,12 +66,12 @@ num4:itemcf, 100
 num5:itemcf, 1000
 num6:user_property,100
 num7:user_property,100
-
+num8:item_tags
 
 num8:mosthot
 num9:random
 
-num7:item_tags
+
 num8:usercf+user_property
 num9:itemcf+item_tags
 
