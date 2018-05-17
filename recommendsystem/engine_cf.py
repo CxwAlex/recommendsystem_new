@@ -20,7 +20,7 @@ def UserSimilarityCF(train):
             if count_columns[u] * count_columns[v]:
                 w[u][v] /= math.sqrt(count_columns[u] * count_columns[v])
         t1 = time.clock()
-        print(u, 'done', t1 - t0)
+        print('usercf', u, 'done', t1 - t0)
     return w
 
 
@@ -158,6 +158,7 @@ def GetItemSimilarity(train, similarity_type=None):
 def GetRankUserCF(train, user=None, k=1, user_similarity=None):
     #W是用户之间的兴趣相似度, k是邻居数目
     if not isinstance(user_similarity, DataFrame):
+        print('不是dataframe')
         user_similarity = UserSimilarityCF(train)
 
     if user:

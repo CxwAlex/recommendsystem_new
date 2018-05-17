@@ -52,12 +52,9 @@ etl模块：负责将原始数据格式转换成内部所使用的dataframe格�
 #但是如果是list的话，那么则会按照默认的方法生成dataframe（横index， 纵columns）
 
 #接下来的验证项目
-1. random
-2. coldstart
-3. usercf
-4. itemcf
+
 5. 社会信息
 6. 时间信息（MostHot，基于时间）
 7. 基于社交网络
-8. 荣和推荐系统的性能
+8. 融合推荐系统的性能
 

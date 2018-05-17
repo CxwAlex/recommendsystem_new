@@ -56,6 +56,7 @@ def MovieLens1MParameters(recommend_engine):
     elif recommend_engine == 'RecommendUserProperty':
         parameters['k'] = [5, 10, 20, 40]
         parameters['N'] = [5, 10, 16]
+        parameters['weight'] = [[0, 0.3, 0.3, 0.3, 0.1], [0, 0.6, 0.3, 0.3, 0.1], [0, 0.3, 0.6, 0.3, 0.1], [0, 0.3, 0.3, 0.6, 0.1]]
     elif recommend_engine == 'RecommendItemSimilarityTime':
         parameters['alpha_item_similarity'] = [0.3, 0.6, 1.0, 2.0]
         parameters['alpha_item_item'] = [0.3, 0.6, 1.0, 2.0]
