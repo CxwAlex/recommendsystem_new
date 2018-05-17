@@ -38,6 +38,45 @@ def SimilarityTags(dataframe, feature=None):
 
     return feature_similarity
 
+def ItemSimilarityTagsList(data_std_item, item=None):
+    if item:
+        items = data_std_item.keys()
+
+        item_similarity = Series(0.0, index=items)
+
+        len_i = len(data_std_item[item])
+        for j in data_std_item.keys():
+            if item == j:
+                continue
+
+            len_j = len(data_std_item[j])
+
+            for i_tag in data_std_item[item]:
+                for j_tag in data_std_item[j]:
+                    if i_tag == j_tag:
+                        item_similarity[j] += 1 / (len_i +len_j)
+    else:
+        items = data_std_item.keys()
+
+        item_similarity = DataFrame(0.0, columns=items, index=items)
+        for i in data_std_item.keys():
+            len_i = len(data_std_item[i])
+            for j in data_std_item.keys():
+                if i == j:
+                    continue
+
+                len_j = len(data_std_item[j])
+
+                for i_tag in data_std_item[i]:
+                    for j_tag in data_std_item[j]:
+                        if i_tag == j_tag:
+                            item_similarity[i][j] += 1 / (len_i +len_j)
+            print("item_sim_tags", i, "done")
+
+    return item_similarity
+
+
+
 #计算基于标签的物品余弦相似度
 #此处假设不包含标签的次数
 def ItemSimilarityTags(item_tags, item=None):

@@ -94,6 +94,7 @@ def MovieLensRatings2Std(filepath, lines=None, users=None, items=None):
 def MovieLensRatings2Std(filepath, lines=None, users=None, items=None):
     data_raw = ReadFile(filepath, lines=lines)
     data_std = []
+
     for i in data_raw:
         j = i.split('::')
         data_std.append(j)
@@ -107,11 +108,28 @@ def MovieLensUsers2Std(filepath, lines=None, users=None, items=None):
     return data_std
 
 
-def MovieLensMovies2Std(filepath, lines=None, users=None, items=None):
-    data_std = MovieLensRatings2Std(filepath, lines, users, items)
+def MovieLensMovies2Std(filepath, lines=None, users=None, items=None, mode='rb'):
+
+    with open(filepath, mode) as f:
+        data_raw = f.readlines()[0:lines]
+
+    data_std = {}
+    for i in data_raw:
+        j = str(i).split('::')
+
+        if len(j[0].split("'")) == 2:
+            j[0] = j[0].split("'")[1]
+        elif len(j[0].split('"')) == 2:
+            j[0] = j[0].split('"')[1]
+
+        j[2] = j[2].split('|')
+
+        data_std[j[0]] = j[2]
+
+    return data_std
 
 
-    #return data_std
+    return data_std
 
 
 def MovieLensStd2Dataframe(data_std, users=None, items=None):

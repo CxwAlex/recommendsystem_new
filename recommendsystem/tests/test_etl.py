@@ -50,18 +50,14 @@ class MovieLensTest(unittest.TestCase):
         read_filepath = pwd + '/test_etl/ratings.dat'
         read_lines = 100
         dataframe = MovieLensRatings2Dataframe(read_filepath, read_lines)
-        print(dataframe)
         self.assertEqual(dataframe['1']['594'], 4)
 
     def test_movie_tag2std(self):
         # 当前文件的路径
-        pwd = os.getcwd()
-        read_filepath = pwd + '/test_etl/ratings.dat'
-        read_lines = 100
-        dataframe = MovieLensRatings2Dataframe(read_filepath, read_lines)
-        print(dataframe)
-        self.assertEqual(dataframe['1']['594'], 4)
-
+        read_filepath = project_filepath + '/dataset/MovieLens/1m/movies.dat'
+        read_lines = 5
+        dataframe = MovieLensMovies2Std(read_filepath, read_lines)
+        self.assertEqual(dataframe['1'], ['Animation', "Children's", 'Comedy\\n"'])
 
 
 if __name__ == '__main__':
