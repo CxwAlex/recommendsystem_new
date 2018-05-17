@@ -94,7 +94,7 @@ def sort_similarity_and_rank(similarity, user=None, N=1):
     if user:
         result = similarity.sort_values(ascending=False).index[0:N]
     else:
-        result= DataFrame(columns=similarity.columns)
+        result = DataFrame(columns=similarity.columns)
         for u in similarity.columns:
             result[u] = similarity[u].sort_values(ascending=False).index[0:N]
 

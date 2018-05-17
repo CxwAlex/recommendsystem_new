@@ -1,8 +1,8 @@
 import pickle
 import os
-import random
-from pandas import Series, DataFrame
+from pandas import DataFrame
 from recommendsystem.utils import get_columns_and_index
+
 
 
 #数据读入模块
@@ -90,6 +90,28 @@ def MovieLensRatings2Std(filepath, lines=None, users=None, items=None):
         data_std.append(j)
 
     return data_std
+
+def MovieLensRatings2Std(filepath, lines=None, users=None, items=None):
+    data_raw = ReadFile(filepath, lines=lines)
+    data_std = []
+    for i in data_raw:
+        j = i.split('::')
+        data_std.append(j)
+
+    return data_std
+
+
+def MovieLensUsers2Std(filepath, lines=None, users=None, items=None):
+    data_std = MovieLensRatings2Std(filepath, lines, users, items)
+
+    return data_std
+
+
+def MovieLensMovies2Std(filepath, lines=None, users=None, items=None):
+    data_std = MovieLensRatings2Std(filepath, lines, users, items)
+
+    #return data_std
+
 
 def MovieLensStd2Dataframe(data_std, users=None, items=None):
     if not users and not items:
