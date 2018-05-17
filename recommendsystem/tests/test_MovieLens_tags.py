@@ -36,6 +36,20 @@ class MovieLensTagRecommendTest(unittest.TestCase):
 
         RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_item=data_std_item, parameters=parameters, repeat_k=10)
 
+    def test_user100(self):
+        # 当前文件的路径
+        read_filepath = project_filepath + '/dataset/MovieLens/1m/ratings_100.dat'
+        data_std = MovieLensMovies2Std(read_filepath)
+
+        read_filepath_item = project_filepath + '/dataset/MovieLens/1m/movies.dat'
+        data_std_item = MovieLensMovies2Std(read_filepath_item)
+
+        recommend_engine = 'RecommendByTags'
+        dataset_name = 'MovieLens1M'
+        parameters = getparaters(dataset_name, recommend_engine)
+
+        RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_item=data_std_item, parameters=parameters, repeat_k=10)
+
 
 
 
