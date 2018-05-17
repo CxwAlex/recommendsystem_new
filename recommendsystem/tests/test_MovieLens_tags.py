@@ -4,7 +4,7 @@ import sys
 pwd = os.getcwd()
 project_filepath = os.path.abspath(os.path.dirname(pwd) + os.path.sep + "..")
 sys.path.append(project_filepath)
-from recommendsystem.ETL import MovieLensMovies2Std
+from recommendsystem.ETL import MovieLensMovies2Std, MovieLensRatings2Std
 from recommendsystem.engine_tags import ItemSimilarityTagsList
 from recommendsystem.TrainAndTestWorkflow import RecommendAndParameterHighSpeed
 from conf.settings import getparaters
@@ -25,7 +25,7 @@ class MovieLensTagRecommendTest(unittest.TestCase):
     def test_user1k(self):
         # 当前文件的路径
         read_filepath = project_filepath + '/dataset/MovieLens/1m/ratings_1kuser.dat'
-        data_std = MovieLensMovies2Std(read_filepath)
+        data_std = MovieLensRatings2Std(read_filepath)
 
         read_filepath_item = project_filepath + '/dataset/MovieLens/1m/movies.dat'
         data_std_item = MovieLensMovies2Std(read_filepath_item)
@@ -39,7 +39,7 @@ class MovieLensTagRecommendTest(unittest.TestCase):
     def test_user100(self):
         # 当前文件的路径
         read_filepath = project_filepath + '/dataset/MovieLens/1m/ratings_100.dat'
-        data_std = MovieLensMovies2Std(read_filepath)
+        data_std = MovieLensRatings2Std(read_filepath)
 
         read_filepath_item = project_filepath + '/dataset/MovieLens/1m/movies.dat'
         data_std_item = MovieLensMovies2Std(read_filepath_item)

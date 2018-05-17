@@ -66,9 +66,11 @@ num4:itemcf, 100
 num5:itemcf, 1000
 num6:user_property,100
 num7:user_property,100
-num8:item_tags
+num8:item_tags,100
+num9:item_tags,1000
+num10:mosthot
 
-num8:mosthot
+
 num9:random
 
 
