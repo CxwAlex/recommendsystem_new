@@ -43,6 +43,10 @@ def PropertySimilarity(property1, property2, i):
         if property1 == property2:
             result = 1
     elif i == 4:
+        if len(property1.split("-")) == 2:
+            property1 = property1.split("-")[0]
+        if len(property2.split("-")) == 2:
+            property2 = property2.split("-")[0]
         result = 1 - abs(int(property2) - int(property1)) / 100000
     else:
         return result
