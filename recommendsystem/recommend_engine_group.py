@@ -46,7 +46,7 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=Non
 
 
                 N = parameters['N']
-                log_name = recommend_engine + "_k=" + str(k) + '_N=' + str(N) + '_similarity=' + similarity
+                log_name = recommend_engine + "_k=" + str(k) + '_N=' + str(N) + '_similarity=' + similarity + '_weight=' + str(weight)
                 t7 = time.clock()
                 recommend = FilterAndSort(train, rank, user, N)
                 t8 = time.clock()
@@ -69,33 +69,38 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=Non
             t2 = time.clock()
             time_item_similarity = t2 - t1
 
-            if parameters:
-                for weight in parameters['weight']:
-                    t3 = time.clock()
-                    user_similarity = UserSimilarityProperty(data_std_user, weight)
-                    t4 = time.clock()
-                    time_user_similarity = t4 - t3
+            weight = parameters['weight']
+            user_similarity_property = UserSimilarityProperty(data_std_user, weight)
+            t3 = time.clock()
+            time_user_similarity_property = t3 - t2
 
-                    for k in parameters['k']:
-                        t5 = time.clock()
-                        rank = GetRankUserCF(train, user, k, user_similarity)
-                        t6 = time.clock()
-                        time_rank = t6 - t5
+            similarity = parameters['similarity']
+            user_similarity = GetUserSimilarity(train, similarity)
+            t4 = time.clock()
+            time_user_similarity = t4 - t3
 
-                        for N in parameters['N']:
-                            t7 = time.clock()
-                            recommend = FilterAndSort(train, rank, user, N)
-                            t8 = time.clock()
-                            time_recommend = t8 - t7
+            for k in parameters['k']:
+                t5 = time.clock()
+                rank_property = GetRankUserCF(train, user, k, user_similarity_property)
+                rank_usercf = GetRankUserCF(train, user, k, user_similarity)
+                rank = rank_property + rank_usercf
+                t6 = time.clock()
+                time_rank = t6 - t5
 
-                            log_name = recommend_engine + "_k=" + str(k) + '_N=' + str(N) + '_weight=' + str(weight)
+                N = parameters['N']
+                t7 = time.clock()
+                recommend = FilterAndSort(train, rank, user, N)
+                t8 = time.clock()
+                time_recommend = t8 - t7
 
-                            summary, spendtime_summary = Summary(train, recommend, test, item_similarity)
-                            t9 = time.clock()
-                            time_summary = t9 - t8
+                log_name = recommend_engine + "_k=" + str(k) + '_N=' + str(N) + '_similarity=' + similarity + '_weight=' + str(weight)
 
-                            time_all = {'time_stddata': time_stddata, 'time_item_similarity': time_item_similarity, 'time_user_similarity': time_user_similarity,  'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                            WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
+                summary, spendtime_summary = Summary(train, recommend, test, item_similarity)
+                t9 = time.clock()
+                time_summary = t9 - t8
+
+                time_all = {'time_stddata': time_stddata, 'time_item_similarity': time_item_similarity, 'time_user_similarity': time_user_similarity,  'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
+                WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
 
     elif recommend_engine == 'RecommendUserCF&ItemCF_rank':
         for i in range(repeat_k):

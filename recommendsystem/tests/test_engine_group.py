@@ -5,7 +5,7 @@ project_filepath = os.path.abspath(os.path.dirname(pwd) + os.path.sep + "..")
 sys.path.append(project_filepath)
 import unittest
 
-from recommendsystem.TrainAndTestWorkflow import *
+from recommendsystem.recommend_engine_group import *
 
 def MovieLens1MParameters(recommend_engine):
     parameters = {}
@@ -42,7 +42,6 @@ class RecommendAndParameterTest(unittest.TestCase):
         recommend_engine = 'RecommendUserCF&UserProperty_similarity'
         parameters = getparaters(recommend_engine)
 
-
         RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=data_std_user, repeat_k=3, parameters=parameters)
 
     def test_usercf_property_rank(self):
@@ -54,8 +53,7 @@ class RecommendAndParameterTest(unittest.TestCase):
         recommend_engine = 'RecommendUserCF&UserProperty_rank'
         parameters = getparaters(recommend_engine)
 
-
-        #RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=data_std_user, repeat_k=3, parameters=parameters)
+        RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=data_std_user, repeat_k=3, parameters=parameters)
 
     def test_usercf_itemcf(self):
         read_filepath = project_filepath + '/dataset/MovieLens/1m/ratings_100user.dat'
