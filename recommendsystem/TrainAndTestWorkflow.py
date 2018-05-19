@@ -129,7 +129,7 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=Non
                         time_summary = t4 - t3
 
                         time_all = {'time_stddata': time_stddata, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                        WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i=1)
+                        WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
 
     elif recommend_engine == 'RecommendUserProperty':
         for i in range(repeat_k):
@@ -168,7 +168,7 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=Non
                             time_summary = t9 - t8
 
                             time_all = {'time_stddata': time_stddata, 'time_item_similarity': time_item_similarity, 'time_user_similarity': time_user_similarity,  'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                            WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i=1)
+                            WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
 
     elif recommend_engine == 'RecommendByTags':
         t0 = time.clock()
@@ -202,7 +202,7 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=Non
                         time_summary = t9 - t8
 
                         time_all = {'time_stddata': time_stddata, 'time_item_similarity': time_item_similarity, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                        WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i=1)
+                        WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
 
     elif recommend_engine == 'RecommendMostHot':
         for i in range(repeat_k):
@@ -238,7 +238,7 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=Non
                 time_summary = t7 - t6
 
                 time_all = {'time_stddata': time_stddata, 'time_count_set': time_count_set, 'time_item_similarity': time_item_similarity, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i=1)
+                WriteSummaryToLog(log_name, time_all, summary, spendtime_summary,i)
 
 
     #social暂不使用，因为没有社交属性数据
