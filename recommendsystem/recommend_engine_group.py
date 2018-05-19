@@ -109,33 +109,35 @@ def RecommendAndParameterHighSpeed(data_std, recommend_engine, data_std_user=Non
             t1 = time.clock()
             time_stddata = t1 - t0
 
-            if parameters:
-                for similarity in parameters['similarity']:
-                    t2 = time.clock()
-                    item_similarity = GetItemSimilarity(train, similarity)
-                    t3 = time.clock()
-                    time_similarity = t3 - t2
+            similarity = parameters['similarity']
+            item_similarity = GetItemSimilarity(train, similarity)
+            t2 = time.clock()
+            time_similarity = t2 - t1
 
-                    for k in parameters['k']:
-                        t4 = time.clock()
-                        rank = GetRankItemCF(train, user, k, item_similarity)
-                        t5 = time.clock()
-                        time_rank = t5 - t4
+            user_similarity = GetUserSimilarity(train, similarity)
+            t3 = time.clock()
+            time_user_similarity = t3 - t2
 
-                        for N in parameters['N']:
-                            log_name = recommend_engine + "_k=" + str(k) + '_N=' + str(N) + '_similarity=' + similarity
+            for k in parameters['k']:
+                t4 = time.clock()
+                rank_itemcf = GetRankItemCF(train, user, k, item_similarity)
+                rank_usercf = GetRankUserCF(train, user, k, user_similarity)
+                rank = rank_itemcf + rank_usercf
+                t5 = time.clock()
+                time_rank = t5 - t4
 
-                            t5 = time.clock()
-                            recommend = FilterAndSort(train, rank, user, N)
-                            t6 = time.clock()
-                            time_recommend = t6 - t5
+                N = parameters['N']
+                log_name = recommend_engine + "_k=" + str(k) + '_N=' + str(N) + '_similarity=' + similarity
 
-                            summary, spendtime_summary = Summary(train, recommend, test, item_similarity)
-                            t7 = time.clock()
-                            time_summary = t7 - t6
-                            time_all = {'time_stddata': time_stddata, 'time_similarity': time_similarity, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
-                            WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
+                recommend = FilterAndSort(train, rank, user, N)
+                t6 = time.clock()
+                time_recommend = t6 - t5
 
+                summary, spendtime_summary = Summary(train, recommend, test, item_similarity)
+                t7 = time.clock()
+                time_summary = t7 - t6
+                time_all = {'time_stddata': time_stddata, 'time_similarity': time_similarity, 'time_user_similarity': time_user_similarity, 'time_rank': time_rank, 'time_recommend': time_recommend, 'time_summary': time_summary}
+                WriteSummaryToLog(log_name, time_all, summary, spendtime_summary, i)
 
 
     return None
