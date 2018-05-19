@@ -135,6 +135,8 @@ def Popularity(train, recommend):
         for item in recommend[user].values:
             if item in item_popularity.index:
                 popularity += math.log(1 + item_popularity[item])
+            else:
+                popularity += math.log(1)
                 n += 1
 
     popularity /= n
