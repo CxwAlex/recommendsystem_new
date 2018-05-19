@@ -28,21 +28,3 @@ class RecommendAndParameterTest(unittest.TestCase):
         parameters = getparaters(dataset_name, recommend_engine)
 
         RecommendAndParameterHighSpeed(data_std, recommend_engine, repeat_k=10, parameters=parameters)
-
-
-class RecommendAndParameter_Test(unittest.TestCase):
-    def test_random1k(self):
-        read_filepath = project_filepath + '/dataset/MovieLens/1m/ratings_1kuser.dat'
-        data_std = MovieLensRatings2Std(read_filepath)
-        recommend_engine = 'RecommendRandom'
-        dataset_name = 'MovieLens1M'
-        parameters = getparaters(dataset_name, recommend_engine)
-        RecommendAndParameterHighSpeed(data_std, recommend_engine, repeat_k=10, parameters=parameters)
-
-    def test_random100(self):
-        read_filepath = project_filepath + '/dataset/MovieLens/1m/ratings_100user.dat'
-        data_std = MovieLensRatings2Std(read_filepath)
-        recommend_engine = 'RecommendRandom'
-        dataset_name = 'MovieLens1M'
-        parameters = getparaters(dataset_name, recommend_engine)
-        RecommendAndParameterHighSpeed(data_std, recommend_engine, repeat_k=10, parameters=parameters)
