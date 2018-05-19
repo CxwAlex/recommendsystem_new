@@ -20,6 +20,7 @@ def MovieLens1MParameters(recommend_engine):
         parameters['N'] = 16
         parameters['weight'] = [0, 0.3, 0.6, 0.3, 0.1]
     elif recommend_engine == 'RecommendUserCF&ItemCF_rank':
+        parameters['similarity'] = 'downhot'
         parameters['k'] = [20,40]
         parameters['N'] = 16
     else:
@@ -63,12 +64,5 @@ class RecommendAndParameterTest(unittest.TestCase):
         parameters = getparaters(recommend_engine)
 
 
-        #RecommendAndParameterHighSpeed(data_std, recommend_engine, repeat_k=3, parameters=parameters)
+        RecommendAndParameterHighSpeed(data_std, recommend_engine, repeat_k=3, parameters=parameters)
 
-    def test_dataframe(self):
-        a = DataFrame([[1,1],[1,2]], columns=[1,0],index=[0,1])
-        print(a)
-        b = DataFrame(1, columns=[0, 1], index=[0, 1])
-        print(b)
-        b = a+b
-        print(b)
