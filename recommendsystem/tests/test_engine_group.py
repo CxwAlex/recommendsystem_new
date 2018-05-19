@@ -10,18 +10,18 @@ from recommendsystem.recommend_engine_group import *
 def MovieLens1MParameters(recommend_engine):
     parameters = {}
     if recommend_engine == 'RecommendUserCF&UserProperty_similarity':
-        parameters['similarity'] = ['downhot']
+        parameters['similarity'] = 'downhot'
         parameters['k'] = [20,40]
-        parameters['N'] = [16]
-        parameters['weight'] = [[0, 0.3, 0.6, 0.3, 0.1]]
+        parameters['N'] = 16
+        parameters['weight'] = [0, 0.3, 0.6, 0.3, 0.1]
     elif recommend_engine == 'RecommendUserCF&UserProperty_rank':
-        parameters['similarity'] = ['downhot']
+        parameters['similarity'] = 'downhot'
         parameters['k'] = [20,40]
-        parameters['N'] = [16]
-        parameters['weight'] = [[0, 0.3, 0.6, 0.3, 0.1]]
+        parameters['N'] = 16
+        parameters['weight'] = [0, 0.3, 0.6, 0.3, 0.1]
     elif recommend_engine == 'RecommendUserCF&ItemCF_rank':
         parameters['k'] = [20,40]
-        parameters['N'] = [16]
+        parameters['N'] = 16
     else:
         return None
 
